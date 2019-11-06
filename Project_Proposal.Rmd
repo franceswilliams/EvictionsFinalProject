@@ -68,16 +68,12 @@ knitr::opts_chunk$set(echo = TRUE)
     + Dynamic maps of each predictor and eviction rate by neighborhood/census tract, over time 
 
 
-<<<<<<< HEAD
-=======
-
-
 ### Planned Timeline
 
 
   * **November 7**: Confirm appropriate data sources 
 
-  * Table of contents for deliverable website (pages, subpages, content) 
+    + Table of contents for deliverable website (pages, subpages, content) 
 
   * **November 11-15**: Have cleaned and merged dataset, initial descriptive plots, and website layout 
 
@@ -85,7 +81,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
   * **December 1**: Final write-up complete 
 
->>>>>>> f5f61fa6297f11bef7c01fa54c5e831be78064a5
 ### Background Reading: 
 
 [The Gentrification of Gotham (CityLab)](https://www.citylab.com/life/2017/04/the-gentrification-of-gotham/524694/)
