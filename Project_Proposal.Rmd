@@ -1,0 +1,20 @@
+---
+title: "Evictions Project Proposal"
+author: "Frances Williams"
+date: "11/6/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## **Project Title:** Demographic and housing correlates of evictions in NYC, 2000-2016
+
+**Group members:** Frances Williams (fw2334), Gloria Hu (gh2518), Naama Kipperman (nk2814), Will Simmons (wes2121)
+
+**Motivation for this project:** Evictions represent a major source of housing instability. We are interested in census tract- and neighborhood-level factors affecting the rates of eviction and eviction filings in NYC. 
+
+**Intended final products:** A website providing an overview of eviction metrics by census tracts, as well as interactive maps illustrating the relationship between neighborhood-level variables and eviction rates. 
+
