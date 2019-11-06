@@ -21,13 +21,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### **Anticipated Data Sources:**
 
-* Primary source: Eviction Lab (https://evictionlab.org/) 
+* Primary source: [Eviction Lab](https://evictionlab.org/) 
 
-* For gentrification measures: (https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
+* For gentrification measures: [New York Gentrification Data](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
 
-* For dissimilarity indices, English language usage, population change: (https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
+* For dissimilarity indices, English language usage, population change: [American FactFinder](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
-* Supplemental data source: NYC Open Data (https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page)
+* Supplemental data source: [NYC Open Data](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page)
 
 ### Planned Timeline
 
@@ -77,14 +77,12 @@ knitr::opts_chunk$set(echo = TRUE)
     + Dynamic maps of each predictor and eviction rate by neighborhood/census tract, over time 
 
 
-
-
 ### Planned Timeline
 
 
   * **November 7**: Confirm appropriate data sources 
 
-  * Table of contents for deliverable website (pages, subpages, content) 
+    + Table of contents for deliverable website (pages, subpages, content) 
 
   * **November 11-15**: Have cleaned and merged dataset, initial descriptive plots, and website layout 
 
@@ -94,6 +92,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Background Reading: 
 
-https://www.citylab.com/life/2017/04/the-gentrification-of-gotham/524694/ 
+[The Gentrification of Gotham (CityLab)](https://www.citylab.com/life/2017/04/the-gentrification-of-gotham/524694/)
 
-https://www.nytimes.com/2019/09/27/nyregion/inwood-manhattan-affordable-housing.html 
+[It’s Manhattan’s Last Affordable Neighborhood. But for How Long? (NYT)](https://www.nytimes.com/2019/09/27/nyregion/inwood-manhattan-affordable-housing.html)
