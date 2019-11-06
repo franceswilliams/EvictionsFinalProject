@@ -1,0 +1,12 @@
+---
+title: "Data Import/Cleaning"
+author: "Naama Kipperman"
+date: "11/6/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Data import of eviction data
