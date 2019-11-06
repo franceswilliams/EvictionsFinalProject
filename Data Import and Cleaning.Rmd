@@ -9,4 +9,10 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-#### Data import of eviction data
+#### Data import of eviction data- Naama
+
+
+#### Data import of gentrification and population density- Will
+
+
+#### Data import of racial composition and English language data- Gloria
