@@ -1,6 +1,5 @@
 ---
 title: "Evictions Project Proposal"
-author: "Frances Williams"
 date: "11/6/2019"
 output: html_document
 ---
