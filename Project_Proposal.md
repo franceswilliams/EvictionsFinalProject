@@ -34,17 +34,55 @@ relationship between neighborhood-level variables and eviction rates.
 
 ### Planned Timeline
 
-**November 7**: Confirm appropriate data sources
+  - **November 7**: Confirm appropriate data sources
 
-Table of contents for deliverable website (pages, subpages, content)
+  - Table of contents for deliverable website (pages, subpages, content)
 
-**November 11-15**: Have cleaned and merged dataset, initial descriptive
-plots, and website layout
+  - **November 11-15**: Have cleaned and merged dataset, initial
+    descriptive plots, and website layout
 
-**November 30**: Visualizations complete
+  - **November 30**: Visualizations complete
 
-**December 1**: Final write-up
-complete
+  - **December 1**: Final write-up complete
+
+### The planned analyses, visualizations, and coding challenges:
+
+  - Analyses: Regressions of the following factors on two outcomes: 1)
+    Eviction rates
+    
+      - Median gross rent (in dataset)
+    
+      - Rent burden (in dataset)
+    
+      - Percent renter occupied (in dataset)
+    
+      - % White (in dataset)
+    
+      - Gentrification indices (external dataset)
+    
+      - Dissimilarity indices (external and will require recoding)
+    
+      - % of English-language speakers (external dataset)
+    
+      - Change in population density (external dataset)
+
+  - Visualizations:
+    
+      - Descriptives
+        
+          - Line graph of eviction rates over time by neighborhood
+            (assuming data available for enough years); if not enough
+            data, then grouped bar chart of eviction rates
+        
+          - Map of eviction rates by census tract over time (choropleth)
+        
+          - Stacked bar chart (or line graph) of discrepancy between
+            eviction filing rates and eviction rates, by neighborhood
+
+  - Analyses
+    
+      - Dynamic maps of each predictor and eviction rate by
+        neighborhood/census tract, over time
 
 ### Background Reading:
 
