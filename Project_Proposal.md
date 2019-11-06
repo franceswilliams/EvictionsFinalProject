@@ -71,6 +71,8 @@ relationship between neighborhood-level variables and eviction rates.
       - Dynamic maps of each predictor and eviction rate by
         neighborhood/census tract, over time
 
+# \<\<\<\<\<\<\< HEAD
+
 ### Planned Timeline
 
   - **November 7**: Confirm appropriate data sources
@@ -82,10 +84,10 @@ relationship between neighborhood-level variables and eviction rates.
 
   - **November 30**: Visualizations complete
 
-  - **December 1**: Final write-up
-complete
+  - **December 1**: Final write-up complete
 
-### Background Reading:
+> > > > > > > f5f61fa6297f11bef7c01fa54c5e831be78064a5 \#\#\# Background
+> > > > > > > Reading:
 
 [The Gentrification of Gotham
 (CityLab)](https://www.citylab.com/life/2017/04/the-gentrification-of-gotham/524694/)
