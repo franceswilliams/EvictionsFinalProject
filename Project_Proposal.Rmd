@@ -1,7 +1,7 @@
 ---
 title: "Evictions Project Proposal"
 date: "11/6/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
