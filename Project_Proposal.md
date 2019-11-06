@@ -31,3 +31,23 @@ relationship between neighborhood-level variables and eviction rates.
 
   - Supplemental data source: NYC Open Data
     (<https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page>)
+
+### Planned Timeline
+
+**November 7**: Confirm appropriate data sources
+
+Table of contents for deliverable website (pages, subpages, content)
+
+**November 11-15**: Have cleaned and merged dataset, initial descriptive
+plots, and website layout
+
+**November 30**: Visualizations complete
+
+**December 1**: Final write-up
+complete
+
+### Background Reading:
+
+<https://www.citylab.com/life/2017/04/the-gentrification-of-gotham/524694/>
+
+<https://www.nytimes.com/2019/09/27/nyregion/inwood-manhattan-affordable-housing.html>
