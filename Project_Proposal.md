@@ -77,9 +77,11 @@ relationship between neighborhood-level variables and eviction rates.
 
   - **November 7**: Confirm appropriate data sources
 
-  - Table of contents for deliverable website (pages, subpages, content)
+  - **November 12**: (1) Table of contents for deliverable website
+    (pages, subpages, content) (2) All relevant datasets loaded into
+    repo
 
-  - **November 11-15**: Have cleaned and merged dataset, initial
+  - **November 16**: Have cleaned and merged dataset, initial
     descriptive plots, and website layout
 
   - **November 30**: Visualizations complete

@@ -8,7 +8,6 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ### **Project Title:** Demographic and housing correlates of evictions in NYC, 2000-2016
 
 ### **Project Overview:**
@@ -29,9 +28,6 @@ knitr::opts_chunk$set(echo = TRUE)
 * For dissimilarity indices, English language usage, population change: [American FactFinder](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
 * Supplemental data source: [NYC Open Data](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page)
-
-
-
 
 ### The planned analyses, visualizations, and coding challenges:
 
@@ -69,12 +65,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Planned Timeline
 
-
   * **November 7**: Confirm appropriate data sources 
 
-  * Table of contents for deliverable website (pages, subpages, content) 
+  * **November 12**: (1) Table of contents for deliverable website (pages, subpages, content) (2) All relevant datasets loaded into repo
 
-  * **November 11-15**: Have cleaned and merged dataset, initial descriptive plots, and website layout 
+  * **November 16**: Have cleaned and merged dataset, initial descriptive plots, and website layout 
 
   * **November 30**: Visualizations complete  
 
