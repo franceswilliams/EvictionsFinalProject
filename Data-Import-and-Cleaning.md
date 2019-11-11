@@ -28,8 +28,18 @@ filenames_DP05 =
   filter(str_detect(value, 'DP05')) %>% 
   pull(., value) ## coerces tibble back to vector for reading by map_df()
 
-participant_data = 
-  cbind(map_df(filenames_DP05, read_csv))
+population_data = 
+  map_dfr(filenames_DP05, read_csv, .id = "input") %>% 
+  janitor::clean_names() %>% 
+  select(id = geo_id, id2 = geo_id2, geography = geo_display_label, total_pop = hc01_vc03, year = input) %>% 
+  filter(id != "Id") %>% 
+  mutate(id2 = as.numeric(id2),
+         year = as.numeric(year) + 2009,
+         name = as.character(readr::parse_number(geography)),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, "),
+         total_pop = as.numeric(total_pop)) %>% 
+  select(id, id2, name, geography, total_pop, year)
 ```
 
     ## Parsed with column specification:
@@ -82,12 +92,6 @@ participant_data =
     ## See spec(...) for full column specifications.
 
 ``` r
-## to do 
-  ## make first row as column names
-  ## extract only population variable per census tract per year
-  ## merge with denominator, below
-  ## calculate crude density per year (should have 17 measures per census tract, one for each year)
-
 ## DENOMINATOR
 ## Importing area in sq. mi. for each area:
 area = 
@@ -118,6 +122,15 @@ area =
     ##   `Land Area in square miles` = col_double()
     ## )
     ## See spec(...) for full column specifications.
+
+``` r
+## JOINING DATASETS & CALCULATING DENSITY
+density_data =
+  left_join(population_data, area) %>% 
+  mutate(density = total_pop / area_sqmi)
+```
+
+    ## Joining, by = c("id", "id2", "name", "geography")
 
 #### Data import of racial composition and English language data *(Gloria)*
 
@@ -348,13 +361,13 @@ race_data %>%
 
 | year | geo\_id              | geo\_id2    | white | black | aian | asian | nhpi | other |
 | :--- | :------------------- | :---------- | ----: | ----: | ---: | ----: | ---: | ----: |
-| 2010 | 1400000US36061000100 | 36061000100 |    NA |    NA |   NA |    NA |   NA |    NA |
-| 2010 | 1400000US36061000201 | 36061000201 |  23.9 |  16.6 |  3.8 |  47.0 |  0.0 |  17.2 |
-| 2010 | 1400000US36061000202 | 36061000202 |  47.4 |  17.2 |  0.7 |  17.6 |  0.0 |  20.8 |
-| 2010 | 1400000US36061000500 | 36061000500 |    NA |    NA |   NA |    NA |   NA |    NA |
-| 2010 | 1400000US36061000600 | 36061000600 |  13.6 |   6.9 |  2.8 |  72.3 |  0.1 |   7.0 |
-| 2010 | 1400000US36061000700 | 36061000700 |  68.6 |   6.0 |  0.4 |  29.9 |  0.0 |   0.6 |
-| 2010 | 1400000US36061000800 | 36061000800 |  10.7 |   1.4 |  0.4 |  87.8 |  0.0 |   1.1 |
-| 2010 | 1400000US36061000900 | 36061000900 |  55.9 |   9.8 |  0.0 |  36.7 |  0.0 |   0.0 |
-| 2010 | 1400000US36061001001 | 36061001001 |  89.4 |   1.7 |  0.0 |   1.8 |  0.0 |   7.1 |
-| 2010 | 1400000US36061001002 | 36061001002 |  27.1 |  21.0 |  1.1 |  13.4 |  0.0 |  41.0 |
+| 2010 | 1400000US36001000100 | 36001000100 |  39.5 |  55.7 |  0.0 |   0.4 |  0.0 |   8.4 |
+| 2010 | 1400000US36001000200 | 36001000200 |  19.1 |  80.3 |  0.0 |   6.3 |  0.0 |   1.9 |
+| 2010 | 1400000US36001000300 | 36001000300 |  49.6 |  45.9 |  0.5 |   2.5 |  0.0 |   4.8 |
+| 2010 | 1400000US36001000401 | 36001000401 |  88.4 |   9.2 |  1.4 |   1.0 |  0.0 |   0.8 |
+| 2010 | 1400000US36001000403 | 36001000403 |  72.0 |   6.4 |  0.8 |  24.0 |  1.2 |   0.6 |
+| 2010 | 1400000US36001000404 | 36001000404 |  68.4 |  13.0 |  1.3 |  10.9 |  0.0 |   7.4 |
+| 2010 | 1400000US36001000501 | 36001000501 |  68.5 |  31.0 |  6.2 |   3.7 |  0.0 |   2.0 |
+| 2010 | 1400000US36001000502 | 36001000502 |  76.6 |  20.1 |  2.9 |   5.1 |  0.3 |   4.2 |
+| 2010 | 1400000US36001000600 | 36001000600 |  43.3 |  39.3 |  1.7 |   7.5 |  0.0 |   9.5 |
+| 2010 | 1400000US36001000700 | 36001000700 |  15.5 |  81.3 |  4.9 |   0.0 |  0.0 |   4.3 |
