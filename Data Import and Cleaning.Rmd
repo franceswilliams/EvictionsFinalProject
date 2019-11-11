@@ -1,18 +1,46 @@
 ---
 title: "Data Import/Cleaning"
-author: "Naama Kipperman"
-date: "11/6/2019"
 output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
 ```
 
-#### Data import of eviction data- Naama
+#### Data import of eviction data *(Naama)*
 
 
-#### Data import of gentrification and population density- Will
+#### Data import of gentrification and population density *(Will)*
+
+In this section we'll import:
+
+  1. NYC gentrification data from *Governing Magazine*'s [**New York City Gentrification Maps and Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
+  2. Population density data from the American Community Survey (ACS) [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
+
+```{r}
+## For the ACS data, we'll have to use a crude measure of population density we calculate ourselves - census tract population (which changes every year) divided by census tract area (which does not usually change). 
+
+## NUMERATOR
+## Importing population per census tract per year
 
 
-#### Data import of racial composition and English language data- Gloria
+## DENOMINATOR
+## Importing area in sq. mi. for each area:
+area = 
+  read_csv('./data/ACS_09_5YR_G001_with_ann.csv', skip = 1) %>% 
+  janitor::clean_names() %>% 
+  select(id, id2, geography, area_sqmi = land_area_in_square_miles) %>% 
+  mutate(name = as.character(readr::parse_number(geography)),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, ")) %>% 
+  select(id, id2, name, geography, area_sqmi)
+
+area %>% 
+  head(10) %>% 
+  knitr::kable()
+```
+
+
+#### Data import of racial composition and English language data *(Gloria)*
