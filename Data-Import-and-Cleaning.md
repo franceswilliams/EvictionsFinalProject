@@ -75,3 +75,131 @@ area %>%
 | 1400000US36001000700 | 3.6001e+10 | 7    | Albany County, New York |      0.611 |
 
 #### Data import of racial composition and English language data *(Gloria)*
+
+In this section we’ll import:
+
+1.  English language usage data from the American Community Survey
+    (ACS), with our primary measure of interest being the percentage of
+    residents who speak English less than “very well” [**5-year census
+    estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
+2.  Data on racial composition by census tract from the American
+    Community Survey (ACS) [**5-year census
+    estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
+
+<!-- end list -->
+
+``` r
+## English language usage data- we import data from 2010-2016
+## Relevant variable the percentage of the population 5 and over that speaks English less than "very well", changes by year- files are therefore individually imported
+
+englang_2010 = 
+  read.csv("./data/ACS_10_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2010", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc170) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
+  select(-hc03_vc170)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_2011 = 
+  read.csv("./data/ACS_11_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2011", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc170) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
+  select(-hc03_vc170)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_2012 = 
+  read.csv("./data/ACS_12_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2012", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc170) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
+  select(-hc03_vc170)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_2013 = 
+  read.csv("./data/ACS_13_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2013", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
+  select(-hc03_vc173)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_2014 = 
+  read.csv("./data/ACS_14_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2014", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
+  select(-hc03_vc173)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_2015 = 
+  read.csv("./data/ACS_15_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2015", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
+  select(-hc03_vc173)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_2016 = 
+  read.csv("./data/ACS_16_5YR_DP02_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2016", as.character(geo_id), as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  filter(geo_id != "Id") %>%
+  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
+  select(-hc03_vc173)
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
+englang_data = 
+  bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016)
+
+englang_data %>% 
+  head(10) %>% 
+  knitr::kable()
+```
+
+| year | geo\_id              | geo\_id2    | pct\_eng |
+| :--- | :------------------- | :---------- | -------: |
+| 2010 | 1400000US36061000100 | 36061000100 |       NA |
+| 2010 | 1400000US36061000201 | 36061000201 |     52.1 |
+| 2010 | 1400000US36061000202 | 36061000202 |     28.3 |
+| 2010 | 1400000US36061000500 | 36061000500 |       NA |
+| 2010 | 1400000US36061000600 | 36061000600 |     55.4 |
+| 2010 | 1400000US36061000700 | 36061000700 |      3.5 |
+| 2010 | 1400000US36061000800 | 36061000800 |     66.0 |
+| 2010 | 1400000US36061000900 | 36061000900 |      0.0 |
+| 2010 | 1400000US36061001001 | 36061001001 |      5.9 |
+| 2010 | 1400000US36061001002 | 36061001002 |     32.6 |
