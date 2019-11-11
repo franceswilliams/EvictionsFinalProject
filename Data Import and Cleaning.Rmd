@@ -19,7 +19,7 @@ In this section we'll import:
   1. NYC gentrification data from *Governing Magazine*'s [**New York City Gentrification Maps and Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
   2. Population density data from the American Community Survey (ACS) [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
-```{r}
+```{r, warning = FALSE}
 ## For the ACS data, we'll have to use a crude measure of population density we calculate ourselves - census tract population (which changes every year) divided by census tract area (which does not usually change). 
 
 ## NUMERATOR
@@ -60,7 +60,7 @@ In this section we'll import:
 
   1. English language usage data from the American Community Survey (ACS), with our primary measure of interest being the percentage of residents who speak English less than "very well" [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
   2. Data on racial composition by census tract from the American Community Survey (ACS) [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
-```{r}
+```{r, warning = FALSE}
 ## English language usage data- we import data from 2010-2016
 ## Relevant variable (the percentage of the population 5 and over that speaks English less than "very well"), changes by year- files are therefore individually imported
 
@@ -135,7 +135,7 @@ englang_data %>%
   knitr::kable()
 ```
 
-```{r}
+```{r, warning = FALSE}
 ## Racial composition data- we import data from 2010-2016
 ## Racial categories are not mutually exclusive, so total percentages may sum to more than 100%
 ## Relevant variable (the percentage of the population 5 and over that speaks English less than "very well"), changes by year- files are therefore individually imported

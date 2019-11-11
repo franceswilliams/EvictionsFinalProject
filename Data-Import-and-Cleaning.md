@@ -21,7 +21,72 @@ In this section we’ll import:
 
 ## NUMERATOR
 ## Importing population per census tract per year
+filenames_DP05 = 
+  list.files('./data/') %>%
+  paste0('./data/', .) %>% 
+  as_tibble() %>% 
+  filter(str_detect(value, 'DP05')) %>% 
+  pull(., value) ## coerces tibble back to vector for reading by map_df()
 
+participant_data = 
+  cbind(map_df(filenames_DP05, read_csv))
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+``` r
+## to do 
+  ## make first row as column names
+  ## extract only population variable per census tract per year
+  ## merge with denominator, below
+  ## calculate crude density per year (should have 17 measures per census tract, one for each year)
 
 ## DENOMINATOR
 ## Importing area in sq. mi. for each area:
@@ -52,27 +117,7 @@ area =
     ##   `Legal/Statistical Area Description Code` = col_character(),
     ##   `Land Area in square miles` = col_double()
     ## )
-
     ## See spec(...) for full column specifications.
-
-``` r
-area %>% 
-  head(10) %>% 
-  knitr::kable()
-```
-
-| id                   |        id2 | name | geography               | area\_sqmi |
-| :------------------- | ---------: | :--- | :---------------------- | ---------: |
-| 1400000US36001000100 | 3.6001e+10 | 1    | Albany County, New York |      0.940 |
-| 1400000US36001000200 | 3.6001e+10 | 2    | Albany County, New York |      0.797 |
-| 1400000US36001000300 | 3.6001e+10 | 3    | Albany County, New York |      2.247 |
-| 1400000US36001000401 | 3.6001e+10 | 4.01 | Albany County, New York |      3.483 |
-| 1400000US36001000403 | 3.6001e+10 | 4.03 | Albany County, New York |      1.211 |
-| 1400000US36001000404 | 3.6001e+10 | 4.04 | Albany County, New York |      0.707 |
-| 1400000US36001000501 | 3.6001e+10 | 5.01 | Albany County, New York |      0.211 |
-| 1400000US36001000502 | 3.6001e+10 | 5.02 | Albany County, New York |      0.300 |
-| 1400000US36001000600 | 3.6001e+10 | 6    | Albany County, New York |      0.196 |
-| 1400000US36001000700 | 3.6001e+10 | 7    | Albany County, New York |      0.611 |
 
 #### Data import of racial composition and English language data *(Gloria)*
 
@@ -100,11 +145,7 @@ englang_2010 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
   select(-hc03_vc170)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2011 = 
   read.csv("./data/ACS_11_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -113,11 +154,7 @@ englang_2011 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
   select(-hc03_vc170)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2012 = 
   read.csv("./data/ACS_12_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -126,11 +163,7 @@ englang_2012 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
   select(-hc03_vc170)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2013 = 
   read.csv("./data/ACS_13_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -139,11 +172,7 @@ englang_2013 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2014 = 
   read.csv("./data/ACS_14_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -152,11 +181,7 @@ englang_2014 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2015 = 
   read.csv("./data/ACS_15_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -165,11 +190,7 @@ englang_2015 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2016 = 
   read.csv("./data/ACS_16_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -178,11 +199,7 @@ englang_2016 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_data = 
   bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016)
 
@@ -224,21 +241,7 @@ race_2010 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2011 = 
   read.csv("./data/ACS_11_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -254,21 +257,7 @@ race_2011 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2012 = 
   read.csv("./data/ACS_12_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -284,21 +273,7 @@ race_2012 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2013 = 
   read.csv("./data/ACS_13_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -314,21 +289,7 @@ race_2013 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2014 = 
   read.csv("./data/ACS_14_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -344,21 +305,7 @@ race_2014 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2015 = 
   read.csv("./data/ACS_15_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -374,21 +321,7 @@ race_2015 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2016 = 
   read.csv("./data/ACS_16_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -404,21 +337,7 @@ race_2016 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_data = 
   bind_rows(race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016)
 
