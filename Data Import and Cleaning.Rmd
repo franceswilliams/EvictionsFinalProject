@@ -24,7 +24,21 @@ In this section we'll import:
 
 ## NUMERATOR
 ## Importing population per census tract per year
+filenames_DP05 = 
+  list.files('./data/') %>%
+  paste0('./data/', .) %>% 
+  as_tibble() %>% 
+  filter(str_detect(value, 'DP05')) %>% 
+  pull(., value) ## coerces tibble back to vector for reading by map_df()
 
+participant_data = 
+  cbind(map_df(filenames_DP05, read_csv))
+
+## to do 
+  ## make first row as column names
+  ## extract only population variable per census tract per year
+  ## merge with denominator, below
+  ## calculate crude density per year (should have 17 measures per census tract, one for each year)
 
 ## DENOMINATOR
 ## Importing area in sq. mi. for each area:
@@ -36,11 +50,9 @@ area =
          geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
          geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, ")) %>% 
   select(id, id2, name, geography, area_sqmi)
-
-area %>% 
-  head(10) %>% 
-  knitr::kable()
 ```
+
+
 
 
 #### Data import of racial composition and English language data *(Gloria)*
