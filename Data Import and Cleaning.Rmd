@@ -32,7 +32,11 @@ filenames_DP05 =
   pull(., value) ## coerces tibble back to vector for reading by map_df()
 
 participant_data = 
-  cbind(map_df(filenames_DP05, read_csv))
+  map_df(filenames_DP05, read_csv) %>%
+  janitor::clean_names() %>% view
+  select(contains("geo"), total_pop = hc01_vc03) 
+
+
 
 ## to do 
   ## make first row as column names
