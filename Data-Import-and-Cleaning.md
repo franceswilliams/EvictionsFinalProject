@@ -90,12 +90,12 @@ In this section we’ll import:
 
 ``` r
 ## English language usage data- we import data from 2010-2016
-## Relevant variable the percentage of the population 5 and over that speaks English less than "very well", changes by year- files are therefore individually imported
+## Relevant variable (the percentage of the population 5 and over that speaks English less than "very well"), changes by year- files are therefore individually imported
 
 englang_2010 = 
   read.csv("./data/ACS_10_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2010", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2010", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc170) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
@@ -108,7 +108,7 @@ englang_2010 =
 englang_2011 = 
   read.csv("./data/ACS_11_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2011", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2011", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc170) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
@@ -121,7 +121,7 @@ englang_2011 =
 englang_2012 = 
   read.csv("./data/ACS_12_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2012", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2012", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc170) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
@@ -134,7 +134,7 @@ englang_2012 =
 englang_2013 = 
   read.csv("./data/ACS_13_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2013", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2013", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc173) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
@@ -147,7 +147,7 @@ englang_2013 =
 englang_2014 = 
   read.csv("./data/ACS_14_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2014", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2014", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc173) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
@@ -160,7 +160,7 @@ englang_2014 =
 englang_2015 = 
   read.csv("./data/ACS_15_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2015", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2015", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc173) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
@@ -173,7 +173,7 @@ englang_2015 =
 englang_2016 = 
   read.csv("./data/ACS_16_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
-  mutate(year = "2016", as.character(geo_id), as.character(geo_id2)) %>%
+  mutate(year = "2016", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
   select(year, geo_id, geo_id2, hc03_vc173) %>%
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
@@ -203,3 +203,239 @@ englang_data %>%
 | 2010 | 1400000US36061000900 | 36061000900 |      0.0 |
 | 2010 | 1400000US36061001001 | 36061001001 |      5.9 |
 | 2010 | 1400000US36061001002 | 36061001002 |     32.6 |
+
+``` r
+## Racial composition data- we import data from 2010-2016
+## Racial categories are not mutually exclusive, so total percentages may sum to more than 100%
+## Relevant variable (the percentage of the population 5 and over that speaks English less than "very well"), changes by year- files are therefore individually imported
+
+race_2010 = 
+  read.csv("./data/ACS_10_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2010", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc72, hc03_vc73, hc03_vc74, hc03_vc75, hc03_vc76, hc03_vc77) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc72, black = hc03_vc73, aian = hc03_vc74, asian = hc03_vc75, nhpi = hc03_vc76, other = hc03_vc77) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_2011 = 
+  read.csv("./data/ACS_11_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2011", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc72, hc03_vc73, hc03_vc74, hc03_vc75, hc03_vc76, hc03_vc77) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc72, black = hc03_vc73, aian = hc03_vc74, asian = hc03_vc75, nhpi = hc03_vc76, other = hc03_vc77) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_2012 = 
+  read.csv("./data/ACS_12_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2012", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc72, hc03_vc73, hc03_vc74, hc03_vc75, hc03_vc76, hc03_vc77) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc72, black = hc03_vc73, aian = hc03_vc74, asian = hc03_vc75, nhpi = hc03_vc76, other = hc03_vc77) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_2013 = 
+  read.csv("./data/ACS_13_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2013", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc78, hc03_vc79, hc03_vc80, hc03_vc81, hc03_vc82, hc03_vc83) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc78, black = hc03_vc79, aian = hc03_vc80, asian = hc03_vc81, nhpi = hc03_vc82, other = hc03_vc83) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_2014 = 
+  read.csv("./data/ACS_14_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2014", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc78, hc03_vc79, hc03_vc80, hc03_vc81, hc03_vc82, hc03_vc83) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc78, black = hc03_vc79, aian = hc03_vc80, asian = hc03_vc81, nhpi = hc03_vc82, other = hc03_vc83) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_2015 = 
+  read.csv("./data/ACS_15_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2015", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc78, hc03_vc79, hc03_vc80, hc03_vc81, hc03_vc82, hc03_vc83) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc78, black = hc03_vc79, aian = hc03_vc80, asian = hc03_vc81, nhpi = hc03_vc82, other = hc03_vc83) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_2016 = 
+  read.csv("./data/ACS_16_5YR_DP05_with_ann.csv") %>%
+  janitor::clean_names() %>%
+  mutate(year = "2016", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
+  select(year, geo_id, geo_id2, hc03_vc78, hc03_vc79, hc03_vc80, hc03_vc81, hc03_vc82, hc03_vc83) %>%
+  filter(geo_id != "Id") %>%
+  rename(white = hc03_vc78, black = hc03_vc79, aian = hc03_vc80, asian = hc03_vc81, nhpi = hc03_vc82, other = hc03_vc83) %>%
+  mutate(
+    white = as.numeric(as.character(white)),
+    black = as.numeric(as.character(black)),
+    aian = as.numeric(as.character(aian)),
+    asian = as.numeric(as.character(asian)),
+    nhpi = as.numeric(as.character(nhpi)),
+    other = as.numeric(as.character(other))
+  )
+```
+
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+    
+    ## Warning: NAs introduced by coercion
+
+``` r
+race_data = 
+  bind_rows(race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016)
+
+race_data %>% 
+  head(10) %>% 
+  knitr::kable()
+```
+
+| year | geo\_id              | geo\_id2    | white | black | aian | asian | nhpi | other |
+| :--- | :------------------- | :---------- | ----: | ----: | ---: | ----: | ---: | ----: |
+| 2010 | 1400000US36061000100 | 36061000100 |    NA |    NA |   NA |    NA |   NA |    NA |
+| 2010 | 1400000US36061000201 | 36061000201 |  23.9 |  16.6 |  3.8 |  47.0 |  0.0 |  17.2 |
+| 2010 | 1400000US36061000202 | 36061000202 |  47.4 |  17.2 |  0.7 |  17.6 |  0.0 |  20.8 |
+| 2010 | 1400000US36061000500 | 36061000500 |    NA |    NA |   NA |    NA |   NA |    NA |
+| 2010 | 1400000US36061000600 | 36061000600 |  13.6 |   6.9 |  2.8 |  72.3 |  0.1 |   7.0 |
+| 2010 | 1400000US36061000700 | 36061000700 |  68.6 |   6.0 |  0.4 |  29.9 |  0.0 |   0.6 |
+| 2010 | 1400000US36061000800 | 36061000800 |  10.7 |   1.4 |  0.4 |  87.8 |  0.0 |   1.1 |
+| 2010 | 1400000US36061000900 | 36061000900 |  55.9 |   9.8 |  0.0 |  36.7 |  0.0 |   0.0 |
+| 2010 | 1400000US36061001001 | 36061001001 |  89.4 |   1.7 |  0.0 |   1.8 |  0.0 |   7.1 |
+| 2010 | 1400000US36061001002 | 36061001002 |  27.1 |  21.0 |  1.1 |  13.4 |  0.0 |  41.0 |
