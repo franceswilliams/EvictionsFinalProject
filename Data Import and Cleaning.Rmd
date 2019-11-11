@@ -31,18 +31,18 @@ filenames_DP05 =
   filter(str_detect(value, 'DP05')) %>% 
   pull(., value) ## coerces tibble back to vector for reading by map_df()
 
-participant_data = 
-  map_df(filenames_DP05, read_csv) %>%
-  janitor::clean_names() %>% view
-  select(contains("geo"), total_pop = hc01_vc03) 
-
-
-
-## to do 
-  ## make first row as column names
-  ## extract only population variable per census tract per year
-  ## merge with denominator, below
-  ## calculate crude density per year (should have 17 measures per census tract, one for each year)
+population_data = 
+  map_dfr(filenames_DP05, read_csv, .id = "input") %>% 
+  janitor::clean_names() %>% 
+  select(id = geo_id, id2 = geo_id2, geography = geo_display_label, total_pop = hc01_vc03, year = input) %>% 
+  filter(id != "Id") %>% 
+  mutate(id2 = as.numeric(id2),
+         year = as.numeric(year) + 2009,
+         name = as.character(readr::parse_number(geography)),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, "),
+         total_pop = as.numeric(total_pop)) %>% 
+  select(id, id2, name, geography, total_pop, year)
 
 ## DENOMINATOR
 ## Importing area in sq. mi. for each area:
@@ -54,6 +54,11 @@ area =
          geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
          geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, ")) %>% 
   select(id, id2, name, geography, area_sqmi)
+
+## JOINING DATASETS & CALCULATING DENSITY
+density_data =
+  left_join(population_data, area) %>% 
+  mutate(density = total_pop / area_sqmi)
 ```
 
 
