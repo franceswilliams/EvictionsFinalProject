@@ -9,12 +9,47 @@ In this section we’ll import:
 
 1.  NYC gentrification data from *Governing Magazine*’s [**New York City
     Gentrification Maps and
-    Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
+    Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)  
+    a. Since the data aren’t available in a format that can be analyzed
+    directly, we’ll instead import data from the *Urban Displacement
+    Project*’s [**Mapping Displacement and Gentrification in the New
+    York Metropolitan Area**](https://www.urbandisplacement.org/maps/ny)
 2.  Population density data from the American Community Survey (ACS)
     [**5-year census
     estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
-<!-- end list -->
+##### Gentrification
+
+``` r
+gentrification =
+  read_excel('./data/udp_ny_final_typology_jan_2019.xlsx') %>% 
+  filter(startsWith(as.character(geoid), '36')) %>% ## just New York state (FIPS = 36, first two digits)
+  rename(id2 = geoid,
+         gent_status = Type_1.19) %>% 
+  mutate(gent_indicator = if_else(gent_status %in% c('LI - Ongoing Gentrification', 'MHI - Advanced Gentrification'),
+                                  1,
+                                  0))
+
+gentrification %>% 
+  arrange(id2) %>% 
+  head(10) %>% 
+  knitr::kable(digits = 11)
+```
+
+|        id2 | gent\_status                                       | gent\_indicator |
+| ---------: | :------------------------------------------------- | --------------: |
+| 3.6005e+10 | MHI - Stable Exclusion                             |               0 |
+| 3.6005e+10 | MHI - Stable Exclusion                             |               0 |
+| 3.6005e+10 | MHI - Stable Exclusion                             |               0 |
+| 3.6005e+10 | LI - At Risk of Gentrification                     |               0 |
+| 3.6005e+10 | LI - Ongoing Gentrification                        |               1 |
+| 3.6005e+10 | LI - At Risk of Gentrification                     |               0 |
+| 3.6005e+10 | LI - At Risk of Gentrification                     |               0 |
+| 3.6005e+10 | Missing Data                                       |               0 |
+| 3.6005e+10 | LI - Ongoing Displacement of Low-Income Households |               0 |
+| 3.6005e+10 | LI - Ongoing Gentrification                        |               1 |
+
+##### Population density
 
 ``` r
 ## For the ACS data, we'll have to use a crude measure of population density we calculate ourselves - census tract population (which changes every year) divided by census tract area (which does not usually change). 
@@ -127,7 +162,7 @@ area =
 ## JOINING DATASETS & CALCULATING DENSITY
 density_data =
   left_join(population_data, area) %>% 
-  mutate(density = total_pop / area_sqmi)
+  mutate(density = total_pop / area_sqmi) 
 ```
 
     ## Joining, by = c("id", "id2", "name", "geography")
