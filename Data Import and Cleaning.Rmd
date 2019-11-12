@@ -19,6 +19,8 @@ In this section we'll import:
   1. NYC gentrification data from *Governing Magazine*'s [**New York City Gentrification Maps and Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
   2. Population density data from the American Community Survey (ACS) [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
+
+
 ```{r, warning = FALSE}
 ## For the ACS data, we'll have to use a crude measure of population density we calculate ourselves - census tract population (which changes every year) divided by census tract area (which does not usually change). 
 

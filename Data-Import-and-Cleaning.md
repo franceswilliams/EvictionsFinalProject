@@ -132,6 +132,26 @@ density_data =
 
     ## Joining, by = c("id", "id2", "name", "geography")
 
+``` r
+## EXAMPLE DATALINES
+density_data %>% 
+  head(10) %>% 
+  knitr::kable()
+```
+
+| id                   |        id2 | name | geography               | total\_pop | year | area\_sqmi |    density |
+| :------------------- | ---------: | :--- | :---------------------- | ---------: | ---: | ---------: | ---------: |
+| 1400000US36001000100 | 3.6001e+10 | 1    | Albany County, New York |       2308 | 2010 |      0.940 |  2455.3191 |
+| 1400000US36001000200 | 3.6001e+10 | 2    | Albany County, New York |       5506 | 2010 |      0.797 |  6908.4065 |
+| 1400000US36001000300 | 3.6001e+10 | 3    | Albany County, New York |       6471 | 2010 |      2.247 |  2879.8398 |
+| 1400000US36001000401 | 3.6001e+10 | 4.01 | Albany County, New York |       2211 | 2010 |      3.483 |   634.7976 |
+| 1400000US36001000403 | 3.6001e+10 | 4.03 | Albany County, New York |       4672 | 2010 |      1.211 |  3857.9686 |
+| 1400000US36001000404 | 3.6001e+10 | 4.04 | Albany County, New York |       5129 | 2010 |      0.707 |  7254.5969 |
+| 1400000US36001000501 | 3.6001e+10 | 5.01 | Albany County, New York |       3247 | 2010 |      0.211 | 15388.6256 |
+| 1400000US36001000502 | 3.6001e+10 | 5.02 | Albany County, New York |       3914 | 2010 |      0.300 | 13046.6667 |
+| 1400000US36001000600 | 3.6001e+10 | 6    | Albany County, New York |       3694 | 2010 |      0.196 | 18846.9388 |
+| 1400000US36001000700 | 3.6001e+10 | 7    | Albany County, New York |       4237 | 2010 |      0.611 |  6934.5336 |
+
 #### Data import of racial composition and English language data *(Gloria)*
 
 In this section we’ll import:
