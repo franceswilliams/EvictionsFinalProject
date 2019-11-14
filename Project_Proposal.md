@@ -32,21 +32,6 @@ relationship between neighborhood-level variables and eviction rates.
   - Supplemental data source: [NYC Open
     Data](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page)
 
-### Planned Timeline
-
-  - **November 7**: Confirm appropriate data sources
-
-  - **November 12**: (1) Table of contents for deliverable website
-    (pages, subpages, content) (2) All relevant datasets loaded into
-    repo
-
-  - **November 16**: Have cleaned and merged dataset, initial
-    descriptive plots, and website layout
-
-  - **November 30**: Visualizations complete
-
-  - **December 1**: Final write-up complete
-
 ### The planned analyses, visualizations, and coding challenges:
 
   - Analyses: Regressions of the following factors on two outcomes: 1)
@@ -86,8 +71,6 @@ relationship between neighborhood-level variables and eviction rates.
       - Dynamic maps of each predictor and eviction rate by
         neighborhood/census tract, over time
 
-# \<\<\<\<\<\<\< HEAD
-
 ### Planned Timeline
 
   - **November 7**: Confirm appropriate data sources
@@ -103,8 +86,7 @@ relationship between neighborhood-level variables and eviction rates.
 
   - **December 1**: Final write-up complete
 
-> > > > > > > f5f61fa6297f11bef7c01fa54c5e831be78064a5 \#\#\# Background
-> > > > > > > Reading:
+### Background Reading:
 
 [The Gentrification of Gotham
 (CityLab)](https://www.citylab.com/life/2017/04/the-gentrification-of-gotham/524694/)

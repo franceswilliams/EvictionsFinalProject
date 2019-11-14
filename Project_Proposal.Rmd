@@ -16,7 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 **Motivation for this project:** Evictions represent a major source of housing instability. We are interested in census tract- and neighborhood-level factors affecting the rates of eviction and eviction filings in NYC. 
 
-**Intended final products:** A website providing an overview of eviction metrics by census tracts, as well as interactive maps illustrating the relationship between neighborhood-level variables and eviction rates. 
+**Intended final products:** A website providing an overview of eviction metrics by c
+ensus tracts, as well as interactive maps illustrating the relationship between neighborhood-level variables and eviction rates. 
 
 
 ### **Anticipated Data Sources:**
@@ -31,7 +32,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### The planned analyses, visualizations, and coding challenges:
 
-  * Analyses: Regressions of the following factors on two outcomes: 1) Eviction rates 
+  * Analyses: Regressions of the following factors on two outcomes: 1) Eviction rates, and 2) Eviction filings
 
       + Median gross rent (in dataset) 
 
