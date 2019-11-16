@@ -26,12 +26,47 @@ In this section we’ll import:
 
 1.  NYC gentrification data from *Governing Magazine*’s [**New York City
     Gentrification Maps and
-    Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
+    Data**](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)  
+    a. Since the data aren’t available in a format that can be analyzed
+    directly, we’ll instead import data from the *Urban Displacement
+    Project*’s [**Mapping Displacement and Gentrification in the New
+    York Metropolitan Area**](https://www.urbandisplacement.org/maps/ny)
 2.  Population density data from the American Community Survey (ACS)
     [**5-year census
     estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
-<!-- end list -->
+##### Gentrification
+
+``` r
+gentrification =
+  read_excel('./data/udp_ny_final_typology_jan_2019.xlsx') %>% 
+  filter(startsWith(as.character(geoid), '36')) %>% ## just New York state (FIPS = 36, first two digits)
+  rename(id2 = geoid,
+         gent_status = Type_1.19) %>% 
+  mutate(gent_indicator = if_else(gent_status %in% c('LI - Ongoing Gentrification', 'MHI - Advanced Gentrification'),
+                                  1,
+                                  0))
+
+gentrification %>% 
+  arrange(id2) %>% 
+  head(10) %>% 
+  knitr::kable(digits = 11)
+```
+
+|        id2 | gent\_status                                       | gent\_indicator |
+| ---------: | :------------------------------------------------- | --------------: |
+| 3.6005e+10 | MHI - Stable Exclusion                             |               0 |
+| 3.6005e+10 | MHI - Stable Exclusion                             |               0 |
+| 3.6005e+10 | MHI - Stable Exclusion                             |               0 |
+| 3.6005e+10 | LI - At Risk of Gentrification                     |               0 |
+| 3.6005e+10 | LI - Ongoing Gentrification                        |               1 |
+| 3.6005e+10 | LI - At Risk of Gentrification                     |               0 |
+| 3.6005e+10 | LI - At Risk of Gentrification                     |               0 |
+| 3.6005e+10 | Missing Data                                       |               0 |
+| 3.6005e+10 | LI - Ongoing Displacement of Low-Income Households |               0 |
+| 3.6005e+10 | LI - Ongoing Gentrification                        |               1 |
+
+##### Population density
 
 ``` r
 ## For the ACS data, we'll have to use a crude measure of population density we calculate ourselves - census tract population (which changes every year) divided by census tract area (which does not usually change). 
@@ -44,6 +79,7 @@ filenames_DP05 =
   as_tibble() %>% 
   filter(str_detect(value, 'DP05')) %>% 
   pull(., value) ## coerces tibble back to vector for reading by map_df()
+<<<<<<< HEAD
 ```
 
     ## Warning: Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `tibble::enframe(name = NULL)` instead.
@@ -53,6 +89,21 @@ filenames_DP05 =
 participant_data = 
   cbind(map_df(filenames_DP05, read_csv))
 ```
+=======
+
+population_data = 
+  map_dfr(filenames_DP05, read_csv, .id = "input") %>% 
+  janitor::clean_names() %>% 
+  select(id = geo_id, id2 = geo_id2, geography = geo_display_label, total_pop = hc01_vc03, year = input) %>% 
+  filter(id != "Id") %>% 
+  mutate(id2 = as.numeric(id2),
+         year = as.numeric(year) + 2009,
+         name = as.character(readr::parse_number(geography)),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
+         geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, "),
+         total_pop = as.numeric(total_pop)) %>% 
+  select(id, id2, name, geography, total_pop, year)
+```
 
     ## Parsed with column specification:
     ## cols(
@@ -74,6 +125,36 @@ participant_data =
     ## )
 
     ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+>>>>>>> c41a085d2a623c997749052f274e8c895861f9bc
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+<<<<<<< HEAD
 
     ## Parsed with column specification:
     ## cols(
@@ -109,7 +190,10 @@ participant_data =
   ## extract only population variable per census tract per year
   ## merge with denominator, below
   ## calculate crude density per year (should have 17 measures per census tract, one for each year)
+=======
+>>>>>>> c41a085d2a623c997749052f274e8c895861f9bc
 
+``` r
 ## DENOMINATOR
 ## Importing area in sq. mi. for each area:
 area = 
@@ -141,6 +225,38 @@ area =
     ## )
     ## See spec(...) for full column specifications.
 
+<<<<<<< HEAD
+=======
+``` r
+## JOINING DATASETS & CALCULATING DENSITY
+density_data =
+  left_join(population_data, area) %>% 
+  mutate(density = total_pop / area_sqmi) 
+```
+
+    ## Joining, by = c("id", "id2", "name", "geography")
+
+``` r
+## EXAMPLE DATALINES
+density_data %>% 
+  head(10) %>% 
+  knitr::kable()
+```
+
+| id                   |        id2 | name | geography               | total\_pop | year | area\_sqmi |    density |
+| :------------------- | ---------: | :--- | :---------------------- | ---------: | ---: | ---------: | ---------: |
+| 1400000US36001000100 | 3.6001e+10 | 1    | Albany County, New York |       2308 | 2010 |      0.940 |  2455.3191 |
+| 1400000US36001000200 | 3.6001e+10 | 2    | Albany County, New York |       5506 | 2010 |      0.797 |  6908.4065 |
+| 1400000US36001000300 | 3.6001e+10 | 3    | Albany County, New York |       6471 | 2010 |      2.247 |  2879.8398 |
+| 1400000US36001000401 | 3.6001e+10 | 4.01 | Albany County, New York |       2211 | 2010 |      3.483 |   634.7976 |
+| 1400000US36001000403 | 3.6001e+10 | 4.03 | Albany County, New York |       4672 | 2010 |      1.211 |  3857.9686 |
+| 1400000US36001000404 | 3.6001e+10 | 4.04 | Albany County, New York |       5129 | 2010 |      0.707 |  7254.5969 |
+| 1400000US36001000501 | 3.6001e+10 | 5.01 | Albany County, New York |       3247 | 2010 |      0.211 | 15388.6256 |
+| 1400000US36001000502 | 3.6001e+10 | 5.02 | Albany County, New York |       3914 | 2010 |      0.300 | 13046.6667 |
+| 1400000US36001000600 | 3.6001e+10 | 6    | Albany County, New York |       3694 | 2010 |      0.196 | 18846.9388 |
+| 1400000US36001000700 | 3.6001e+10 | 7    | Albany County, New York |       4237 | 2010 |      0.611 |  6934.5336 |
+
+>>>>>>> c41a085d2a623c997749052f274e8c895861f9bc
 #### Data import of racial composition and English language data *(Gloria)*
 
 In this section we’ll import:
@@ -167,11 +283,7 @@ englang_2010 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
   select(-hc03_vc170)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2011 = 
   read.csv("./data/ACS_11_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -180,11 +292,7 @@ englang_2011 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
   select(-hc03_vc170)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2012 = 
   read.csv("./data/ACS_12_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -193,11 +301,7 @@ englang_2012 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
   select(-hc03_vc170)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2013 = 
   read.csv("./data/ACS_13_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -206,11 +310,7 @@ englang_2013 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2014 = 
   read.csv("./data/ACS_14_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -219,11 +319,7 @@ englang_2014 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2015 = 
   read.csv("./data/ACS_15_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -232,11 +328,7 @@ englang_2015 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_2016 = 
   read.csv("./data/ACS_16_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -245,11 +337,7 @@ englang_2016 =
   filter(geo_id != "Id") %>%
   mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
   select(-hc03_vc173)
-```
 
-    ## Warning: NAs introduced by coercion
-
-``` r
 englang_data = 
   bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016)
 
@@ -260,16 +348,16 @@ englang_data %>%
 
 | year | geo\_id              | geo\_id2    | pct\_eng |
 | :--- | :------------------- | :---------- | -------: |
-| 2010 | 1400000US36061000100 | 36061000100 |       NA |
-| 2010 | 1400000US36061000201 | 36061000201 |     52.1 |
-| 2010 | 1400000US36061000202 | 36061000202 |     28.3 |
-| 2010 | 1400000US36061000500 | 36061000500 |       NA |
-| 2010 | 1400000US36061000600 | 36061000600 |     55.4 |
-| 2010 | 1400000US36061000700 | 36061000700 |      3.5 |
-| 2010 | 1400000US36061000800 | 36061000800 |     66.0 |
-| 2010 | 1400000US36061000900 | 36061000900 |      0.0 |
-| 2010 | 1400000US36061001001 | 36061001001 |      5.9 |
-| 2010 | 1400000US36061001002 | 36061001002 |     32.6 |
+| 2010 | 1400000US36001000100 | 36001000100 |     13.8 |
+| 2010 | 1400000US36001000200 | 36001000200 |      1.7 |
+| 2010 | 1400000US36001000300 | 36001000300 |      4.6 |
+| 2010 | 1400000US36001000401 | 36001000401 |      1.0 |
+| 2010 | 1400000US36001000403 | 36001000403 |      8.5 |
+| 2010 | 1400000US36001000404 | 36001000404 |      5.1 |
+| 2010 | 1400000US36001000501 | 36001000501 |      2.2 |
+| 2010 | 1400000US36001000502 | 36001000502 |      3.2 |
+| 2010 | 1400000US36001000600 | 36001000600 |     15.4 |
+| 2010 | 1400000US36001000700 | 36001000700 |      3.0 |
 
 ``` r
 ## Racial composition data- we import data from 2010-2016
@@ -291,21 +379,7 @@ race_2010 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2011 = 
   read.csv("./data/ACS_11_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -321,21 +395,7 @@ race_2011 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2012 = 
   read.csv("./data/ACS_12_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -351,21 +411,7 @@ race_2012 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2013 = 
   read.csv("./data/ACS_13_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -381,21 +427,7 @@ race_2013 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2014 = 
   read.csv("./data/ACS_14_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -411,21 +443,7 @@ race_2014 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2015 = 
   read.csv("./data/ACS_15_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -441,21 +459,7 @@ race_2015 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_2016 = 
   read.csv("./data/ACS_16_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
@@ -471,21 +475,7 @@ race_2016 =
     nhpi = as.numeric(as.character(nhpi)),
     other = as.numeric(as.character(other))
   )
-```
 
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-    
-    ## Warning: NAs introduced by coercion
-
-``` r
 race_data = 
   bind_rows(race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016)
 
@@ -496,13 +486,13 @@ race_data %>%
 
 | year | geo\_id              | geo\_id2    | white | black | aian | asian | nhpi | other |
 | :--- | :------------------- | :---------- | ----: | ----: | ---: | ----: | ---: | ----: |
-| 2010 | 1400000US36061000100 | 36061000100 |    NA |    NA |   NA |    NA |   NA |    NA |
-| 2010 | 1400000US36061000201 | 36061000201 |  23.9 |  16.6 |  3.8 |  47.0 |  0.0 |  17.2 |
-| 2010 | 1400000US36061000202 | 36061000202 |  47.4 |  17.2 |  0.7 |  17.6 |  0.0 |  20.8 |
-| 2010 | 1400000US36061000500 | 36061000500 |    NA |    NA |   NA |    NA |   NA |    NA |
-| 2010 | 1400000US36061000600 | 36061000600 |  13.6 |   6.9 |  2.8 |  72.3 |  0.1 |   7.0 |
-| 2010 | 1400000US36061000700 | 36061000700 |  68.6 |   6.0 |  0.4 |  29.9 |  0.0 |   0.6 |
-| 2010 | 1400000US36061000800 | 36061000800 |  10.7 |   1.4 |  0.4 |  87.8 |  0.0 |   1.1 |
-| 2010 | 1400000US36061000900 | 36061000900 |  55.9 |   9.8 |  0.0 |  36.7 |  0.0 |   0.0 |
-| 2010 | 1400000US36061001001 | 36061001001 |  89.4 |   1.7 |  0.0 |   1.8 |  0.0 |   7.1 |
-| 2010 | 1400000US36061001002 | 36061001002 |  27.1 |  21.0 |  1.1 |  13.4 |  0.0 |  41.0 |
+| 2010 | 1400000US36001000100 | 36001000100 |  39.5 |  55.7 |  0.0 |   0.4 |  0.0 |   8.4 |
+| 2010 | 1400000US36001000200 | 36001000200 |  19.1 |  80.3 |  0.0 |   6.3 |  0.0 |   1.9 |
+| 2010 | 1400000US36001000300 | 36001000300 |  49.6 |  45.9 |  0.5 |   2.5 |  0.0 |   4.8 |
+| 2010 | 1400000US36001000401 | 36001000401 |  88.4 |   9.2 |  1.4 |   1.0 |  0.0 |   0.8 |
+| 2010 | 1400000US36001000403 | 36001000403 |  72.0 |   6.4 |  0.8 |  24.0 |  1.2 |   0.6 |
+| 2010 | 1400000US36001000404 | 36001000404 |  68.4 |  13.0 |  1.3 |  10.9 |  0.0 |   7.4 |
+| 2010 | 1400000US36001000501 | 36001000501 |  68.5 |  31.0 |  6.2 |   3.7 |  0.0 |   2.0 |
+| 2010 | 1400000US36001000502 | 36001000502 |  76.6 |  20.1 |  2.9 |   5.1 |  0.3 |   4.2 |
+| 2010 | 1400000US36001000600 | 36001000600 |  43.3 |  39.3 |  1.7 |   7.5 |  0.0 |   9.5 |
+| 2010 | 1400000US36001000700 | 36001000700 |  15.5 |  81.3 |  4.9 |   0.0 |  0.0 |   4.3 |
