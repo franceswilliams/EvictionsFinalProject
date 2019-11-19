@@ -11,51 +11,47 @@ Kipperman (nk2814), Will Simmons (wes2121)
 
 **Motivation for this project:** Evictions represent a major source of
 housing instability. We are interested in census tract- and
-neighborhood-level factors affecting the rates of eviction and eviction
-filings in NYC.
+neighborhood-level predictors of eviction rates in NYC.
 
 **Intended final products:** A website providing an overview of eviction
-metrics by census tracts, as well as interactive maps illustrating the
-relationship between neighborhood-level variables and eviction rates.
+rate predictors at the census tract level, as well as interactive maps
+illustrating the relationship between eviction rates and census-tract
+and neighborhood-level predictors.
 
 ### **Anticipated Data Sources:**
 
   - Primary source: [Eviction Lab](https://evictionlab.org/)
 
-  - For gentrification measures: [New York Gentrification
-    Data](https://www.governing.com/gov-data/new-york-gentrification-maps-demographic-data.html)
+  - For gentrification measures: [Mapping Displacement and
+    Gentrification in the New York Metropolitan Area (Urban Displacement
+    Project)](https://www.urbandisplacement.org/maps/ny)
 
-  - For dissimilarity indices, English language usage, population
-    change: [American
+  - For English language usage and population density: [American
     FactFinder](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
   - Supplemental data source: [NYC Open
     Data](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page)
 
-### The planned analyses, visualizations, and coding challenges:
+### Planned Analyses and Visualizations
 
-  - Analyses: Regressions of the following factors on two outcomes: 1)
-    Eviction rates
+  - Analyses: Regressions of the following predictors on our primary
+    outcome, *eviction rates*.
     
-      - Median gross rent (in dataset)
+      - **Rent burden** (in dataset)
     
-      - Rent burden (in dataset)
+      - **Percent Non-white** (in dataset)
     
-      - Percent renter occupied (in dataset)
+      - **Percent of English-language speakers** (external dataset)
     
-      - % White (in dataset)
+      - **Population density** (external dataset)
     
-      - Gentrification indices (external dataset)
-    
-      - Dissimilarity indices (external and will require recoding)
-    
-      - % of English-language speakers (external dataset)
-    
-      - Change in population density (external dataset)
+    *Note: We’ll then compare the above simple linear regression models
+    via cross-validation to gauge which, if any, is the best predictor
+    of eviction rates in NYC.*
 
   - Visualizations:
     
-      - Descriptives
+      - Descriptive
         
           - Line graph of eviction rates over time by neighborhood
             (assuming data available for enough years); if not enough
@@ -65,11 +61,30 @@ relationship between neighborhood-level variables and eviction rates.
         
           - Stacked bar chart (or line graph) of discrepancy between
             eviction filing rates and eviction rates, by neighborhood
-
-  - Analyses
     
-      - Dynamic maps of each predictor and eviction rate by
-        neighborhood/census tract, over time
+      - Analytic
+        
+          - Dynamic maps of each predictor and eviction rate by
+            neighborhood/census tract, over time
+        
+          - (If time permits) Neighborhood-level evictions by
+            gentrification indices (external dataset)
+
+### Anticipated Challenges
+
+  - Integration of existing R and GIS knowledge to create cohesive,
+    self-explanatory geographic visualizations
+
+  - Missing data across multiple datasets in use - making sure that:
+    
+      - Models are comparable given potential for different missing data
+        structures
+    
+      - Models are interpretable both in aggregate across NYC and for
+        specific Census Tracts
+    
+      - Addressing the fact that our data exist across time - how do we
+        model predictor-outcome relationship from 2000-2016?
 
 ### Planned Timeline
 
