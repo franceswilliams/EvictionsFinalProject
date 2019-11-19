@@ -22,7 +22,7 @@ In this section, we'll import eviction data, which includes eviction rates and o
 
 
 eviction = 
-  read.csv('EvictionData_NY.csv') %>% 
+  read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
   filter(parent_location %in% c("Manhattan County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York")) 
 

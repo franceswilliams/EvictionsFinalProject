@@ -53,7 +53,7 @@ and neighborhood-level predictors.
     
       - Descriptive
         
-          - Line graph of eviction rates over time by neighborhood
+          - Spaghetti plot of eviction rates over time by neighborhood
             (assuming data available for enough years); if not enough
             data, then grouped bar chart of eviction rates
         

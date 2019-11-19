@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Neighborhood Data"
 author: "Frances Williams"
 date: "11/8/2019"
 output: html_document
@@ -15,10 +15,13 @@ library(readxl)
 ```
 
 ```{r}
-neighborhood_df = read_excel("data/NYC_neighborhoods_by_censustract_2010.xlsx", skip = 5, col_names = c("borough", "county_code", "boro_code", "census_tract", "PUMA", "nta_code", "neighborhood")) %>% 
+neighborhood_df = 
+  read_excel("./data/NYC_neighborhoods_by_censustract_2010.xlsx", 
+             skip = 5, 
+             col_names = c("borough", "county_code", "boro_code", "census_tract", "PUMA", "nta_code", "neighborhood")
+             ) %>% 
 #creating 11 digit FIPS code by pasting country code (36) with `county_code` and `census_tract`
-  mutate(
-    geo_id = paste0("36", county_code, census_tract)
+  mutate(geo_id = paste0("36", county_code, census_tract)
   )
 
 ```

@@ -4,8 +4,7 @@ Data Import/Cleaning
 #### Data import of eviction data *(Naama)*
 
 In this section, we’ll import eviction data, which includes eviction
-rates and other relevant metrics by census
-tract.
+rates and other relevant metrics by census tract.
 
 ``` r
 # CSV file contains all census tracts for NY state, so we'll import the file and then filter such that the dataframe 'eviction' only contains NYC census tracts.
@@ -15,7 +14,7 @@ tract.
 
 
 eviction = 
-  read.csv('EvictionData_NY.csv') %>% 
+  read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
   filter(parent_location %in% c("Manhattan County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York")) 
 ```
@@ -79,17 +78,6 @@ filenames_DP05 =
   as_tibble() %>% 
   filter(str_detect(value, 'DP05')) %>% 
   pull(., value) ## coerces tibble back to vector for reading by map_df()
-<<<<<<< HEAD
-```
-
-    ## Warning: Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `tibble::enframe(name = NULL)` instead.
-    ## This warning is displayed once per session.
-
-``` r
-participant_data = 
-  cbind(map_df(filenames_DP05, read_csv))
-```
-=======
 
 population_data = 
   map_dfr(filenames_DP05, read_csv, .id = "input") %>% 
@@ -132,7 +120,6 @@ population_data =
     ## )
 
     ## See spec(...) for full column specifications.
->>>>>>> c41a085d2a623c997749052f274e8c895861f9bc
 
     ## Parsed with column specification:
     ## cols(
@@ -154,44 +141,6 @@ population_data =
     ## )
 
     ## See spec(...) for full column specifications.
-<<<<<<< HEAD
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   .default = col_character()
-    ## )
-
-    ## See spec(...) for full column specifications.
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   .default = col_character()
-    ## )
-
-    ## See spec(...) for full column specifications.
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   .default = col_character()
-    ## )
-
-    ## See spec(...) for full column specifications.
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   .default = col_character()
-    ## )
-
-    ## See spec(...) for full column specifications.
-
-``` r
-## to do 
-  ## make first row as column names
-  ## extract only population variable per census tract per year
-  ## merge with denominator, below
-  ## calculate crude density per year (should have 17 measures per census tract, one for each year)
-=======
->>>>>>> c41a085d2a623c997749052f274e8c895861f9bc
 
 ``` r
 ## DENOMINATOR
@@ -225,8 +174,6 @@ area =
     ## )
     ## See spec(...) for full column specifications.
 
-<<<<<<< HEAD
-=======
 ``` r
 ## JOINING DATASETS & CALCULATING DENSITY
 density_data =
@@ -256,7 +203,6 @@ density_data %>%
 | 1400000US36001000600 | 3.6001e+10 | 6    | Albany County, New York |       3694 | 2010 |      0.196 | 18846.9388 |
 | 1400000US36001000700 | 3.6001e+10 | 7    | Albany County, New York |       4237 | 2010 |      0.611 |  6934.5336 |
 
->>>>>>> c41a085d2a623c997749052f274e8c895861f9bc
 #### Data import of racial composition and English language data *(Gloria)*
 
 In this section we’ll import:

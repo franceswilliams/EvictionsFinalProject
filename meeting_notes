@@ -13,3 +13,27 @@ Add:
   - Potential challenges
   - Just 4 predictors
   - Cross-validation
+  
+---
+
+To do:
+
+  * Data
+    - Merge and clean final dataset, with missing data investigated
+    - Initial descriptive plots
+    - Simple linear regression analyses (4)
+    - Cross-validation of 4 linear regression analyses
+    
+  * Visualizations for website
+    - Spaghetti plot of eviction rates over time by neighborhood (use neighborhood data conversion uploaded by Frances?)
+    - Map of eviction rates by census tract over time (choropleth) 
+    - Dynamic maps of each predictor and eviction rate by neighborhood/census tract, over time (Shiny app?)
+    - (If time permits) Neighborhood-level evictions by gentrification indices
+    - Interpretations/accompanying text for all visualizations 
+    
+  * Website
+    - Table of contents for deliverable website (pages, subpages, content)
+    - Empty pages for actual website built, with Git structure created (e.g. xxx.github.io site created)
+    - Fill pages with text where needed
+    - Fill pages with visualizations and interpretations where needed
+  
