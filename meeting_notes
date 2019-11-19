@@ -1,0 +1,15 @@
+Run simple linear regressions, do cross-validation
+
+Anticipated challenges
+  - GIS and R integration
+  - Missing data - making sure we fit our analyses to the data we have
+      - Focusing more in-depth analyses on Brooklyn
+  - Looks ambitious
+  
+Try to stay as close to proposal as possible... to pare down a bit:
+  - Just look at four predictors on simple linear regressions, and do cross-validation on four
+  
+Add:
+  - Potential challenges
+  - Just 4 predictors
+  - Cross-validation
