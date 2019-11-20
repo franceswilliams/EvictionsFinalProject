@@ -2,7 +2,7 @@
 title: "Meeting notes and progress tracking"
 author: "Gloria Hu (gh2518)"
 date: "11/20/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
