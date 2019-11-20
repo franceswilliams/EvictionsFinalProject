@@ -1,0 +1,31 @@
+---
+title: "Meeting notes and progress tracking"
+author: "Gloria Hu (gh2518)"
+date: "11/20/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 11202019 Project Rescope and Assignments
+
+## Project Rescope
+- 2010-2016
+- Restrict boroughs to Brooklyn
+- Predictors: % English speaking, rent burden, % non-White, population density
+
+## Assignments
+Question 1: How have eviction rates changed over time by census tract in Brooklyn, 2010-2016?
+* Spaghetti plot of eviction rates over time by neighborhood; if not enough data, then grouped bar chart of eviction rates
+* Map of eviction rates by census tract over time (choropleth)
+
+Question 2: Are there discrepancies between eviction filing rates and eviction rates at the neighborhood level in Brooklyn?
+* Stacked bar chart (or line graph) of discrepancy between eviction filing rates and eviction rates
+* Map of discrepancy between eviction filing rates and eviction rates (absolute difference- percentage points)
+
+Question 3: What factors are associated with eviction rates across census tract in Brooklyn?
+* Dynamic maps of each predictor over eviction rates over time
+* Simple univariate regressions of each predictor on eviction rates
+

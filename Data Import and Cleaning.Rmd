@@ -7,6 +7,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
+library(plotly)
 ```
 
 #### Data import of eviction data *(Naama)*
@@ -24,7 +25,7 @@ In this section, we'll import eviction data, which includes eviction rates and o
 eviction = 
   read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
-  filter(parent_location %in% c("Manhattan County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York")) 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"))
 
 ```
 
