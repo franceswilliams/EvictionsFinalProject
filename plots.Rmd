@@ -9,9 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Question 1
 
 ```{r}
-# Plot of average eviction rate across all Brooklyn census tracts over time
+# Spaghetti plot of average eviction rate across all Brooklyn census tracts over time
 
 brooklyn_plot = 
   read.csv('./data/EvictionData_NY.csv') %>% 
@@ -27,8 +28,15 @@ brooklyn_plot =
   summarize(
     avg_rate = mean(eviction_rate)
   ) %>% 
-  ggplot(aes(x=year, y=avg_rate, group=year)) + geom_point()+geom_line()
+  ggplot(aes(x=year, y=avg_rate, group=year)) + geom_point()+geom_line(aes(group=year))+labs(x="Year", y="Overall Borough-wide Rate of Eviction")
 
 brooklyn_plot
+ggplotly(brooklyn_plot)
+```
+```{r}
+
+# Map of eviction rates by census tract over time in Brooklyn (chloropleth)
+
+
 ```
 
