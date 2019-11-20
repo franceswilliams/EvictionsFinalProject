@@ -31,33 +31,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Planned Analyses and Visualizations
 
-  * Analyses: Regressions of the following predictors on our primary outcome, *eviction rates*.
+Question 1: How have eviction rates changed over time by census tract in Brooklyn, 2010-2016?
 
-      + __Rent burden__ (in dataset) 
+  * Spaghetti plot of eviction rates over time (by neighborhood; if not enough data, then grouped bar chart of eviction rates (for Brooklyn overall)
 
-      + __Percent Non-white__ (in dataset) 
+  * Map of eviction rates by census tract over time (choropleth)
 
-      + __Percent of English-language speakers__ (external dataset) 
+Question 2: Are there discrepancies between eviction filing rates and eviction rates at the neighborhood level in Brooklyn?
 
-      + __Population density__ (external dataset) 
-      
-      *Note: We'll then compare the above simple linear regression models via cross-validation to gauge which, if any, is the best predictor of eviction rates in NYC.*
+  * Stacked bar chart (or line graph) of discrepancy between eviction filing rates and eviction rates
 
-  * Visualizations: 
+  * Map of discrepancy between eviction filing rates and eviction rates (absolute difference- percentage points)
 
-      + Descriptive
+Question 3: What factors are associated with eviction rates across census tract in Brooklyn?
 
-        * Spaghetti plot of eviction rates over time by neighborhood (assuming data available for enough years); if not enough data, then grouped bar chart of eviction rates 
+  * Dynamic maps of each predictor over eviction rates over time
 
-        * Map of eviction rates by census tract over time (choropleth) 
-
-        * Stacked bar chart (or line graph) of discrepancy between eviction filing rates and eviction rates, by neighborhood 
-
-      + Analytic
-
-        * Dynamic maps of each predictor and eviction rate by neighborhood/census tract, over time 
-        
-        * (If time permits) Neighborhood-level evictions by gentrification indices (external dataset)
+  * Simple univariate regressions of each predictor on eviction rates
 
 ### Anticipated Challenges
 

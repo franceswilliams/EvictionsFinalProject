@@ -34,41 +34,30 @@ and neighborhood-level predictors.
 
 ### Planned Analyses and Visualizations
 
-  - Analyses: Regressions of the following predictors on our primary
-    outcome, *eviction rates*.
-    
-      - **Rent burden** (in dataset)
-    
-      - **Percent Non-white** (in dataset)
-    
-      - **Percent of English-language speakers** (external dataset)
-    
-      - **Population density** (external dataset)
-    
-    *Note: We’ll then compare the above simple linear regression models
-    via cross-validation to gauge which, if any, is the best predictor
-    of eviction rates in NYC.*
+Question 1: How have eviction rates changed over time by census tract in
+Brooklyn, 2010-2016?
 
-  - Visualizations:
-    
-      - Descriptive
-        
-          - Spaghetti plot of eviction rates over time by neighborhood
-            (assuming data available for enough years); if not enough
-            data, then grouped bar chart of eviction rates
-        
-          - Map of eviction rates by census tract over time (choropleth)
-        
-          - Stacked bar chart (or line graph) of discrepancy between
-            eviction filing rates and eviction rates, by neighborhood
-    
-      - Analytic
-        
-          - Dynamic maps of each predictor and eviction rate by
-            neighborhood/census tract, over time
-        
-          - (If time permits) Neighborhood-level evictions by
-            gentrification indices (external dataset)
+  - Spaghetti plot of eviction rates over time (by neighborhood; if not
+    enough data, then grouped bar chart of eviction rates (for Brooklyn
+    overall)
+
+  - Map of eviction rates by census tract over time (choropleth)
+
+Question 2: Are there discrepancies between eviction filing rates and
+eviction rates at the neighborhood level in Brooklyn?
+
+  - Stacked bar chart (or line graph) of discrepancy between eviction
+    filing rates and eviction rates
+
+  - Map of discrepancy between eviction filing rates and eviction rates
+    (absolute difference- percentage points)
+
+Question 3: What factors are associated with eviction rates across
+census tract in Brooklyn?
+
+  - Dynamic maps of each predictor over eviction rates over time
+
+  - Simple univariate regressions of each predictor on eviction rates
 
 ### Anticipated Challenges
 
@@ -84,7 +73,7 @@ and neighborhood-level predictors.
         specific Census Tracts
     
       - Addressing the fact that our data exist across time - how do we
-        model predictor-outcome relationship from 2000-2016?
+        model predictor-outcome relationship from 2010-2016?
 
 ### Planned Timeline
 
