@@ -69,7 +69,7 @@ knitr::opts_chunk$set(echo = TRUE)
       
       + Models are interpretable both in aggregate across NYC and for specific Census Tracts
       
-      + Addressing the fact that our data exist across time - how do we model predictor-outcome relationship from 2000-2016?
+      + Addressing the fact that our data exist across time - how do we model predictor-outcome relationship from 2010-2016?
 
 ### Planned Timeline
 
