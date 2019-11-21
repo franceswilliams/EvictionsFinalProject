@@ -1,0 +1,32 @@
+---
+title: "Mapping"
+author: "Gloria Hu (gh2518)"
+date: "11/21/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rgdal)
+```
+
+Map import
+```{r}
+# Census tracts- taken from https://data.cityofnewyork.us/City-Government/2010-Census-Tracts/fxpq-c8ku
+census_tracts = rgdal::readOGR(dsn = "./maps", layer = "2010-census-tracts")
+
+ggplot() + 
+  geom_polygon(data = census_tracts, aes(x = long, y = lat, group = group), colour = "black", fill = NA) +
+  coord_equal()
+
+# Neighborhoods- taken from https://data.cityofnewyork.us/City-Government/Neighborhood-Tabulation-Areas/cpf4-rkhq
+
+nta = rgdal::readOGR(dsn = "./maps", layer = "2010-NTAs")
+
+ggplot() + 
+  geom_polygon(data = nta, aes(x = long, y = lat, group = group), colour = "black", fill = NA) +
+  coord_equal()
+
+```
+
