@@ -7,11 +7,32 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(plotly)
 ```
 
 Question 1
 
 ```{r}
+
+# Basic descriptive plot 
+
+eviction_rate_by_borough =  
+  read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York")) %>% 
+  select(parent_location, year, eviction_rate, eviction_filing_rate) %>% 
+  group_by(parent_location, year) %>% 
+  drop_na(eviction_rate) %>% 
+  summarize(avg_eviction = mean(eviction_rate)) %>% 
+    filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York")) %>% 
+  ggplot(aes(x=year, y=avg_eviction, group=parent_location, color=parent_location)) + geom_point() + geom_line()
+
+eviction_rate_by_borough
+  
+  
+  
 # Spaghetti plot of average eviction rate across all Brooklyn census tracts over time
 
 brooklyn_plot = 
@@ -23,16 +44,19 @@ brooklyn_plot =
     year=as.factor(year)
   ) %>% 
   select(year, eviction_rate) %>% 
-  drop_na(eviction_rate) %>% 
   group_by(year) %>% 
   summarize(
     avg_rate = mean(eviction_rate)
   ) %>% 
-  ggplot(aes(x=year, y=avg_rate, group=year)) + geom_point()+geom_line(aes(group=year))+labs(x="Year", y="Overall Borough-wide Rate of Eviction")
+  ggplot(aes(x=year, y=avg_rate, group=1)) + geom_point() + geom_line() + labs(x="Year", y="Overall Borough-wide Rate of Eviction (%)")
 
-brooklyn_plot
-ggplotly(brooklyn_plot)
+brooklyn_plot %>% 
+  ggplotly()
+
 ```
+
+
+
 ```{r}
 
 # Map of eviction rates by census tract over time in Brooklyn (chloropleth)
