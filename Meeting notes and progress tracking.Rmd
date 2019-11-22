@@ -52,3 +52,7 @@ Naama
 Gloria
 * Question 3
 * Website (two weeks from now)
+
+### Info on GEOIDs
+
+[Census Bureau](https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html) - scroll almost all the way to the bottom

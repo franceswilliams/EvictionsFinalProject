@@ -45,7 +45,7 @@ Question 2: Are there discrepancies between eviction filing rates and eviction r
 
 Question 3: What factors are associated with eviction rates across census tract in Brooklyn?
 
-  * Dynamic maps of each predictor over eviction rates over time
+  * Dynamic maps of each predictor over eviction rates over time (% English speaking, rent burden, % non-White, population density)
 
   * Simple univariate regressions of each predictor on eviction rates
 

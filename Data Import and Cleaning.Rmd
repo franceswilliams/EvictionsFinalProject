@@ -1,9 +1,12 @@
 ---
 title: "Data Import/Cleaning"
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
+options(scipen = 999) # keeps R from using scientific notation with large GEOIDs
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
@@ -25,7 +28,16 @@ In this section, we'll import eviction data, which includes eviction rates and o
 eviction = 
   read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
-  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"))
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+         year %in% c(2010:2016),
+         population != 0) %>% 
+  
+  ## selecting and renaming variables
+  mutate(pct_nonwhite = (100 - pct_white)) %>% 
+  select(geoid, year, poverty_rate, rent_burden, pct_nonwhite_evictiondata = pct_nonwhite, evictions, eviction_filings, eviction_rate, eviction_filing_rate, total_pop_evictiondata = population, renter_occupied_households) %>% 
+  filter(renter_occupied_households > 10) # census tracts with few renter households were creating eviction rates of 150, 200, etc.
+
+## note: eviction filing rate calculated (# evictions / # renter occupied households)
 
 ```
 
@@ -39,7 +51,7 @@ In this section we'll import:
     a. Since the data aren't available in a format that can be analyzed directly, we'll instead import data from the *Urban Displacement Project*'s [**Mapping Displacement and Gentrification in the New York Metropolitan Area**](https://www.urbandisplacement.org/maps/ny)
   2. Population density data from the American Community Survey (ACS) [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
 
-##### Gentrification
+##### Gentrification (not using for now)
 ```{r, warning = FALSE}
 gentrification =
   read_excel('./data/udp_ny_final_typology_jan_2019.xlsx') %>% 
@@ -50,10 +62,10 @@ gentrification =
                                   1,
                                   0))
 
-gentrification %>% 
-  arrange(id2) %>% 
-  head(10) %>% 
-  knitr::kable(digits = 11)
+# gentrification %>% 
+#   arrange(id2) %>% 
+#   head(10) %>% 
+#   knitr::kable(digits = 11)
 ```
 
 
@@ -81,7 +93,8 @@ population_data =
          geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
          geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, "),
          total_pop = as.numeric(total_pop)) %>% 
-  select(id, id2, name, geography, total_pop, year)
+  select(id, id2, name, geography, total_pop, year) %>% 
+  filter(total_pop != 0)
 
 ## DENOMINATOR
 ## Importing area in sq. mi. for each area:
@@ -92,17 +105,19 @@ area =
   mutate(name = as.character(readr::parse_number(geography)),
          geography = str_remove(geography, "Census Tract [0-9]{1,}, "),
          geography = str_remove(geography, "Census Tract [0-9]{1,}\\.[0-9]{1,}, ")) %>% 
-  select(id, id2, name, geography, area_sqmi)
+  select(id2, area_sqmi)
 
 ## JOINING DATASETS & CALCULATING DENSITY
 density_data =
-  left_join(population_data, area) %>% 
-  mutate(density = total_pop / area_sqmi) 
+  left_join(population_data, area, by = "id2") %>% 
+  mutate(density = total_pop / area_sqmi) %>% 
 
-## EXAMPLE DATALINES
-density_data %>% 
-  head(10) %>% 
-  knitr::kable()
+  ## selecting and renaming meaningful variables
+
+  filter(geography %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+       year %in% c(2010:2016)) %>% 
+  select(geoid = id2, year, total_pop_densitydata = total_pop, area_sqmi, density)
+  
 ```
 
 #### Data import of racial composition and English language data *(Gloria)*
@@ -110,6 +125,7 @@ In this section we'll import:
 
   1. English language usage data from the American Community Survey (ACS), with our primary measure of interest being the percentage of residents who speak English less than "very well" [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
   2. Data on racial composition by census tract from the American Community Survey (ACS) [**5-year census estimates**](https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml)
+  
 ```{r, warning = FALSE}
 ## English language usage data- we import data from 2010-2016
 ## Relevant variable (the percentage of the population 5 and over that speaks English less than "very well"), changes by year- files are therefore individually imported
@@ -178,11 +194,17 @@ englang_2016 =
   select(-hc03_vc173)
 
 englang_data = 
-  bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016)
+  bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016) %>% 
+  mutate(geo_id2 = as.numeric(geo_id2),
+         year = as.numeric(year)) %>% 
+  
+  ## restricting and renaming etc.
+  select(geoid = geo_id2, year, pct_eng) %>% 
+  
+  ## bronx, kings, new york, queens, richmond counties - using codes (need to triple-check these match up with County Names)
+  filter(substr(geoid, 1,5) %in% c(36005, 36047, 36061, 36081, 36085),
+         year %in% c(2010:2016))
 
-englang_data %>% 
-  head(10) %>% 
-  knitr::kable()
 ```
 
 ```{r, warning = FALSE}
@@ -303,13 +325,74 @@ race_2016 =
   )
 
 race_data = 
-  bind_rows(race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016)
-
-race_data %>% 
-  head(10) %>% 
-  knitr::kable()
+  bind_rows(race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016) %>% 
+  
+  ## creating % nonwhite
+  mutate(pct_nonwhite_racedata = (100 - white),
+         geo_id2 = as.numeric(geo_id2),
+         year = as.numeric(year)) %>% 
+  
+  ## restricting and renaming etc.
+  select(geoid = geo_id2, year, pct_nonwhite_racedata) %>% 
+  
+  ## bronx, kings, new york, queens, richmond counties - using codes (need to triple-check these match up with County Names)
+  filter(substr(geoid, 1,5) %in% c(36005, 36047, 36061, 36081, 36085),
+         year %in% c(2010:2016))
 
 ```
 
+#### Joining datasets
+
+```{r}
+## creating key for geoid <--> boro
+geoid_boro_key = 
+  read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+         year %in% c(2010:2016)) %>% 
+  select(geoid, county = parent_location) %>% 
+  mutate(boro = recode(county, "New York County, New York" = "Manhattan", 
+                               "Queens County, New York" = "Queens", 
+                               "Kings County, New York" = "Brooklyn", 
+                               "Bronx County, New York" = "Bronx", 
+                               "Richmond County, New York" = "Staten Island")) %>% 
+  distinct()
+```
+
+
+```{r}
+## all rows regardless of NA, using outer (full) join
+
+joined_data = 
+  eviction %>% 
+  full_join(., density_data, by = c("geoid", "year")) %>% 
+  full_join(., englang_data,  by = c("geoid", "year")) %>% 
+  full_join(., race_data,  by = c("geoid", "year")) %>% 
+  inner_join(., geoid_boro_key, by = "geoid") %>% 
+  filter(boro == "Brooklyn") %>%
   
+  ## reordering variables
   
+  select(geoid, year, boro, county, ## geo/time
+         evictions, eviction_rate, eviction_filings, eviction_filing_rate, ## outcomes
+         pct_nonwhite_evictiondata, pct_nonwhite_racedata, rent_burden, pct_eng, density, ## predictors
+         renter_occupied_households, total_pop_evictiondata, total_pop_densitydata, area_sqmi, ## calculation variable
+         poverty_rate ## contextual variable
+         )
+        
+
+## all rows with all needed information, no missing
+joined_data_nomissing =
+  joined_data %>% 
+  drop_na()
+
+```
+
+```{r}
+## just to clean up environment
+# rm(area,
+#    englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016,
+#    race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016,
+#    filenames_DP05)
+```
+
