@@ -369,7 +369,6 @@ joined_data =
   full_join(., englang_data,  by = c("geoid", "year")) %>% 
   full_join(., race_data,  by = c("geoid", "year")) %>% 
   inner_join(., geoid_boro_key, by = "geoid") %>% 
-  filter(boro == "Brooklyn") %>%
   
   ## reordering variables
   
@@ -379,20 +378,25 @@ joined_data =
          renter_occupied_households, total_pop_evictiondata, total_pop_densitydata, area_sqmi, ## calculation variable
          poverty_rate ## contextual variable
          )
-        
+
+## just brooklyn
+joined_data_bklyn =
+  joined_data %>% 
+  filter(boro == "Brooklyn")
 
 ## all rows with all needed information, no missing
-joined_data_nomissing =
-  joined_data %>% 
+joined_data_bklyn_nomissing =
+  joined_data_bklyn %>% 
   drop_na()
 
 ```
 
 ```{r}
-## just to clean up environment
-# rm(area,
-#    englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016,
-#    race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016,
-#    filenames_DP05)
+## just to clean up your environment - uncomment the below chuck with Ctrl+Shift+C, then run, then re-comment with Ctrl+Shift+C
+
+rm(area,
+   englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016,
+   race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016,
+   filenames_DP05)
 ```
 
