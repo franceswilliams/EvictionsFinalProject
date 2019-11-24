@@ -438,7 +438,7 @@ pred_list = list("pct_eng" = pull(joined_data_bklyn_nomissing, pct_eng),
 
 gee_output = map(pred_list, univariate) %>%
   do.call(rbind, .) %>%
-  knitr::kable()
+  knitr::kable(digits = 2)
 
 gee_output
 ```
