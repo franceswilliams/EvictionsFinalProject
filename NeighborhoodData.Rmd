@@ -12,6 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(readxl)
+library(plotly)
+library(rgdal)
+library(maps)
+library(devtools)
+library(leaflet)
+library(maptools)
+library(BAMMtools)
 ```
 
 ```{r}
@@ -23,6 +30,31 @@ neighborhood_df =
 #creating 11 digit FIPS code by pasting country code (36) with `county_code` and `census_tract`
   mutate(geo_id = paste0("36", county_code, census_tract)
   )
+
+```
+
+Merging with evictions data
+```{r}
+eviction_data = read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(year == 2016) %>% 
+  mutate(geoid = as.character(geoid)) %>% 
+  filter(parent_location == "Kings County, New York") %>% 
+  left_join(neighborhood_df, by = c("geoid" = "geo_id"))
+
+neighborhood_data = eviction_data %>% 
+  group_by(neighborhood) %>% 
+  mutate(
+    neighb_pop = sum(population),
+    tract_weight = population/neighb_pop)
+
+
+```
+
+Loading neighborhood shapefile from NYC open data
+```{r}
+neighborhood_map = readOGR(dsn = "mapping_files/NYCneighborhoods.shp", encoding = "UTF-8")
+
 
 ```
 
