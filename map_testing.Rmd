@@ -1,0 +1,86 @@
+---
+title: "Map_testing"
+author: "Frances Williams"
+date: "11/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(rgdal)
+library(maps)
+library(devtools)
+library(leaflet)
+library(maptools)
+library(BAMMtools)
+```
+
+```{r}
+census_tracts = readOGR(dsn = "mapping_files/censustracts2010.shp", encoding = "UTF-8") 
+
+census_tracts@data = census_tracts@data %>% 
+  mutate(
+    county_code = as.character(recode(boro_code, "1" = "061", "2" = "005", "3" = "047", "4" = "081", "5" = "085")),
+    ct2010 = as.character(ct2010),
+    fips_11dig = paste0("36", county_code, ct2010))
+
+#loading eviction data
+eviction_data = read_csv("data/EvictionData_NY.csv") %>%
+  janitor::clean_names() %>% 
+  mutate(geoid = as.character(geoid)) %>% 
+  filter(year == 2000)
+
+census_tracts@data = left_join(census_tracts@data, eviction_data, by = c("fips_11dig" = "geoid"))
+
+```
+
+```{r}
+census_tracts_crs = spTransform(census_tracts, CRS("+init=epsg:4326"))
+
+writeOGR(census_tracts_crs, './mapping_files/census_tracts_geojson', layer = 'census_tracts', driver = 'GeoJSON')
+```
+
+```{r}
+#pop up label
+label_popup = paste0(
+  "<strong>Census tract: </strong>",
+  census_tracts$ct2010,
+  "<br><strong>Eviction rate: </strong>",
+  census_tracts$eviction_rate
+)
+
+# get jenks natural breaks -- 5?????
+getJenksBreaks(census_tracts$eviction_rate, 8)
+
+#set bins based on natural breaks
+eviction_rate_bins = c(0, 3, 15, 42, 100, 210, 300, 600)
+
+#set color palette
+eviction_palette = colorBin('Greens', bins = eviction_rate_bins, na.color = '#aaff56')
+```
+
+Creating choropleth
+```{r}
+leaflet::leaflet(data = census_tracts_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    popup = label_popup,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
+      addLegend('bottomleft',
+                pal = eviction_palette,
+                values = ~eviction_rate,
+                title = 'Eviction rates in NYC by census tract',
+                opacity = 1)
+              
+```
+
