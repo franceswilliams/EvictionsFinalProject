@@ -225,5 +225,10 @@ Since the effect of population density on eviction count wasn't statistically si
 
 __Next Steps__
 
-  * Compare models to saturated models
-  * Cross-validation of models
+  * Correlation analysis of predictors (prevent multicollinearity)
+  * Raw plots of predictor vs. outcome? Log outcome? How to visualize?
+  * Model building process ideas:
+    + Fit vs. Residual plots, with investigation of outliers
+    + Compare models to saturated models (i.e. all main effects and interaction terms)
+    + Cross-validation of models
+  * Shiny app that builds model based on any variable we have (output = # evictions per 100 renter households per year)
