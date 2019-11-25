@@ -33,7 +33,7 @@ neighborhood_df =
 
 ```
 
-Merging with evictions data
+Merging with evictions data/cleaning, weighting, and summarizing neighborhood-level data
 ```{r}
 eviction_data = read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
@@ -42,19 +42,77 @@ eviction_data = read.csv('./data/EvictionData_NY.csv') %>%
   filter(parent_location == "Kings County, New York") %>% 
   left_join(neighborhood_df, by = c("geoid" = "geo_id"))
 
-neighborhood_data = eviction_data %>% 
+neighborhood_data_prep = eviction_data %>% 
   group_by(neighborhood) %>% 
   mutate(
     neighb_pop = sum(population),
-    tract_weight = population/neighb_pop)
+    tract_weight = population/neighb_pop,
+    eviction_discrepancy = eviction_filing_rate - eviction_rate,
+    weighted_eviction_discrep = eviction_discrepancy*tract_weight,
+    weighted_eviction_rate = eviction_rate*tract_weight)
 
+neighborhood_data = neighborhood_data_prep %>% 
+  summarize(
+    wt_eviction_rate = sum(weighted_eviction_rate),
+    wt_eviction_rate_discrep = sum(weighted_eviction_discrep)) %>% 
+  ungroup() %>% 
+  mutate(neighborhood = as.factor(neighborhood))
+  
 
 ```
 
 Loading neighborhood shapefile from NYC open data
 ```{r}
-neighborhood_map = readOGR(dsn = "mapping_files/NYCneighborhoods.shp", encoding = "UTF-8")
+neighborhood_map = readOGR(dsn = "mapping_files/NYC_BKneighborhoods.shp", encoding = "UTF-8")
 
+#neighborhood_map@data = neighborhood_map@data %>% 
+#  filter(boro_name == "Brooklyn")
 
+neighborhood_map@data = left_join(neighborhood_map@data, neighborhood_data, by = c("ntaname" = "neighborhood"))
 ```
 
+```{r}
+neighborhood_map_crs = spTransform(neighborhood_map, CRS("+init=epsg:4326"))
+
+#writeOGR(neighborhood_map_crs, './mapping_files/neighborhood_map_geojson', layer = 'neighborhoods', driver = 'GeoJSON')
+```
+
+```{r}
+#pop up label
+label_popup = paste0(
+  "<strong>Neighborhood: </strong>",
+  neighborhood_map$ntaname,
+  "<br><strong>Eviction rate: </strong>",
+  neighborhood_map$wt_eviction_rate
+)
+
+# get jenks natural breaks
+getJenksBreaks(neighborhood_map$wt_eviction_rate, 5)
+
+#set bins based on natural breaks
+eviction_rate_bins = c(0.2, 1.0, 1.8, 2.7, 3.6)
+
+#set color palette
+eviction_palette = colorBin('Reds', bins = eviction_rate_bins, na.color = '#aaff56')
+```
+
+Map of Eviction Rates by Neighborhood
+```{r}
+leaflet::leaflet(data = neighborhood_map_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(wt_eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    popup = label_popup,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
+      addLegend('bottomleft',
+                pal = eviction_palette,
+                values = ~wt_eviction_rate,
+                title = 'Eviction rates in Brooklyn by neighborhood',
+                opacity = 1)
+              
+```
+
+Map of Eviction rate/filing discrepancy by neighborhood
