@@ -35,7 +35,7 @@ eviction =
   
   ## selecting and renaming variables
   mutate(pct_nonwhite = (100 - pct_white),
-         geoid = as.character(geoid),
+         geoid = as.factor(geoid),
          year = as.ordered(year)) %>% 
   select(geoid, year, poverty_rate, rent_burden, pct_nonwhite_evictiondata = pct_nonwhite, evictions, eviction_filings, eviction_rate, eviction_filing_rate, total_pop_evictiondata = population, renter_occupied_households) %>% 
   filter(renter_occupied_households > 10) # census tracts with few renter households were creating eviction rates of 150, 200, etc.
@@ -64,7 +64,7 @@ gentrification =
   mutate(gent_indicator = if_else(gent_status %in% c('LI - Ongoing Gentrification', 'MHI - Advanced Gentrification'),
                                   1,
                                   0),
-         id2 = as.character(id2))
+         id2 = as.factor(id2))
 
 # gentrification %>% 
 #   arrange(id2) %>% 
@@ -115,7 +115,7 @@ area =
 density_data =
   left_join(population_data, area, by = "id2") %>% 
   mutate(density = total_pop / area_sqmi,
-         id2 = as.character(id2),
+         id2 = as.factor(id2),
          year = as.ordered(year)) %>% 
 
   ## selecting and renaming meaningful variables
@@ -201,8 +201,8 @@ englang_2016 =
 
 englang_data = 
   bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016) %>% 
-  mutate(geo_id2 = as.character(geo_id2),
-         year = as.ordered(year)) %>% 
+  mutate(geo_id2 = as.factor(geo_id2),
+         year = as.factor(year)) %>% 
   
   ## restricting and renaming etc.
   select(geoid = geo_id2, year, pct_eng) %>% 
@@ -335,8 +335,8 @@ race_data =
   
   ## creating % nonwhite
   mutate(pct_nonwhite_racedata = (100 - white),
-         geo_id2 = as.character(geo_id2),
-         year = as.ordered(year)) %>% 
+         geo_id2 = as.factor(geo_id2),
+         year = as.factor(year)) %>% 
   
   ## restricting and renaming etc.
   select(geoid = geo_id2, year, pct_nonwhite_racedata) %>% 
@@ -357,8 +357,7 @@ geoid_boro_key =
   filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
          year %in% c(2010:2016)) %>% 
   select(geoid, county = parent_location) %>% 
-  mutate(geoid = as.character(geoid),
-         boro = recode(county, "New York County, New York" = "Manhattan", 
+  mutate(boro = recode(county, "New York County, New York" = "Manhattan", 
                                "Queens County, New York" = "Queens", 
                                "Kings County, New York" = "Brooklyn", 
                                "Bronx County, New York" = "Bronx", 
@@ -377,16 +376,14 @@ joined_data =
   full_join(., race_data,  by = c("geoid", "year")) %>% 
   inner_join(., geoid_boro_key, by = "geoid") %>% 
   
-  mutate(years_since_2010 = as.numeric(year) - 1) %>%  ## continuous year measure range 0-6, years since 2010
-  
   ## reordering variables
   
-  select(geoid, year, years_since_2010, boro, county, ## geo/time
+  select(geoid, year, boro, county, ## geo/time
          evictions, eviction_rate, eviction_filings, eviction_filing_rate, ## outcomes
          pct_nonwhite_evictiondata, pct_nonwhite_racedata, rent_burden, pct_eng, density, ## predictors
          renter_occupied_households, total_pop_evictiondata, total_pop_densitydata, area_sqmi, ## calculation variable
          poverty_rate ## contextual variable
-         ) 
+         )
 
 ## just brooklyn
 joined_data_bklyn =
@@ -413,7 +410,6 @@ rm(area,
 
 ## Regressions (Question 3)
 
-### Continuous outcome (Gaussian)
 The generalized estimating equation for eviction rates (continuous) on each of our predictors of interest are as follows:
 
 E(evictions_ij) = β0 + β1(year_ij) + β2(predictor_ij) + β3(year_ij*predictor_ij)
@@ -458,7 +454,6 @@ __Example interpretation:__
 
 * For each 1% increase in the non-White population, the eviction rate appears to decrease by 12.94, and this relationship is significant at the 5% level. However, this relationship appears to be attenuating over time.
 
-### Count-based outcome (Poisson)
 ```{r}
 ## poisson distribution of counts (and rates)
 joined_data_bklyn_nomissing %>% 
@@ -472,34 +467,33 @@ joined_data_bklyn_nomissing %>%
 ## trying glm with Poisson
 univariate_poi = function(x){
   
-  gee_poi = geeglm(evictions ~ 
-                   #(eviction_filings - evictions) ~ ## testing discrepancy in rate as outcome - subtracted counts, kept offset
-                   offset(log(renter_occupied_households)) + x + years_since_2010, ## here i removed the int term
+  gee_poi = geeglm(evictions ~ offset(log(renter_occupied_households)) + x + year + year*x, ## here i removed the int term
                    data = joined_data_bklyn_nomissing, 
                    id = geoid, 
                    family = poisson, 
                    corstr = "ar1") %>% ## ar(1) corstr due to autocorrelation in data across time
-  broom::tidy(conf.int = FALSE,
+  broom::tidy(conf.int = FALSE, 
               conf.level = 0.95,
-              exponentiate = FALSE,
+              exponentiate = FALSE, 
               quick = FALSE)
-  tibble(
-    b0_est = gee_poi[[1,2]],
-    b0_p = gee_poi[[1,5]],
-    b1_est = gee_poi[[2,2]],
-    b1_p = gee_poi[[2,5]],
-    year_est = gee_poi[[3,2]],
-    year_p = gee_poi[[3,5]],
-    # interaction_est = gee_poi[[4,2]], ## removed the int term
-    # interaction_p = gee_poi[[4,5]]
-  )
+
+  # tibble(
+  #   b0_est = gee_poi[[1,2]],
+  #   b0_p = gee_poi[[1,5]],
+  #   b1_est = gee_poi[[2,2]],
+  #   b1_p = gee_poi[[2,5]],
+  #   year_est = gee_poi[[3,2]],
+  #   year_p = gee_poi[[3,5]],
+  #   # interaction_est = gee_poi[[4,2]], ## removed the int term
+  #   # interaction_p = gee_poi[[4,5]]
+  # )
   
 }
 
 pred_list = list("pct_eng" = pull(joined_data_bklyn_nomissing, pct_eng), 
                  "rent_burden" = pull(joined_data_bklyn_nomissing, rent_burden), 
                  "pct_nonwhite" = pull(joined_data_bklyn_nomissing, pct_nonwhite_racedata), 
-                 "pop_density" = pull(joined_data_bklyn_nomissing, total_pop_densitydata),
+                 "pop_density" = pull(joined_data_bklyn_nomissing, total_pop_densitydata)
                  )
 
 gee_poi_output = map(pred_list, univariate_poi) %>%
@@ -509,11 +503,11 @@ gee_poi_output = map(pred_list, univariate_poi) %>%
 gee_poi_output
 ```
 
-__Next Steps__
+__Questions__
 
-  * Cross-validation of models
-
-
+  * Adding/removing the interaction term with time changes the beta estimate significantly. Something I need to look more into.
+  * Making sure the model is set up correctly with `geeglm`
+  * Compare AIC or cross-validate models with/out interaction term
   
 ```{r}
 ## testing poisson model over years in individual glm regressions
