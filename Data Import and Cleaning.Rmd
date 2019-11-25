@@ -37,7 +37,7 @@ eviction =
   mutate(pct_nonwhite = (100 - pct_white),
          geoid = as.character(geoid),
          year = as.ordered(year)) %>% 
-  select(geoid, year, poverty_rate, rent_burden, pct_nonwhite_evictiondata = pct_nonwhite, evictions, eviction_filings, eviction_rate, eviction_filing_rate, total_pop_evictiondata = population, renter_occupied_households) %>% 
+  select(geoid, year, poverty_rate, rent_burden, pct_nonwhite_evictiondata = pct_nonwhite, evictions, eviction_filings, eviction_rate, eviction_filing_rate, total_pop_evictiondata = population, renter_occupied_households, pct_af_am) %>% 
   filter(renter_occupied_households > 10) # census tracts with few renter households were creating eviction rates of 150, 200, etc.
 
 ## note: eviction filing rate calculated (# evictions / # renter occupied households)
@@ -385,7 +385,7 @@ joined_data =
          evictions, eviction_rate, eviction_filings, eviction_filing_rate, ## outcomes
          pct_nonwhite_evictiondata, pct_nonwhite_racedata, rent_burden, pct_eng, density, ## predictors
          renter_occupied_households, total_pop_evictiondata, total_pop_densitydata, area_sqmi, ## calculation variable
-         poverty_rate ## contextual variable
+         poverty_rate, pct_af_am ## contextual variable
          ) 
 
 ## just brooklyn
@@ -396,7 +396,9 @@ joined_data_bklyn =
 ## all rows with all needed information, no missing
 joined_data_bklyn_nomissing =
   joined_data_bklyn %>% 
-  drop_na() %>% 
+  drop_na()
+
+joined_data_bklyn_nomissing %>% 
   saveRDS(file = './data/joined_data_bklyn_nomissing') ## saving to use in other files (use [obj_name] = readRDS([pathway]) )
 
 ```

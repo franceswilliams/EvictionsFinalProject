@@ -503,7 +503,7 @@ univariate_poi = function(x){
   
   gee_poi = geeglm(evictions ~ 
                    #(eviction_filings - evictions) ~ ## testing discrepancy in rate as outcome - subtracted counts, kept offset
-                   offset(log(renter_occupied_households/100)) + x + years_since_2010, ## here i removed the int term
+                   offset(log(renter_occupied_households)) + x + years_since_2010, ## here i removed the int term
                    data = joined_data_bklyn_nomissing, 
                    id = geoid, 
                    family = poisson, 
@@ -559,8 +559,8 @@ gee_poi_output</code></pre>
 <tbody>
 <tr class="odd">
 <td>pct_eng</td>
-<td align="right">0.60</td>
-<td align="right">0.00</td>
+<td align="right">-4.01</td>
+<td align="right">0</td>
 <td align="right">-0.02</td>
 <td align="right">0.98</td>
 <td align="right">0.82</td>
@@ -571,8 +571,8 @@ gee_poi_output</code></pre>
 </tr>
 <tr class="even">
 <td>rent_burden</td>
-<td align="right">-0.15</td>
-<td align="right">0.35</td>
+<td align="right">-4.76</td>
+<td align="right">0</td>
 <td align="right">0.01</td>
 <td align="right">1.01</td>
 <td align="right">1.12</td>
@@ -583,8 +583,8 @@ gee_poi_output</code></pre>
 </tr>
 <tr class="odd">
 <td>pct_nonwhite</td>
-<td align="right">-1.42</td>
-<td align="right">0.00</td>
+<td align="right">-6.03</td>
+<td align="right">0</td>
 <td align="right">0.02</td>
 <td align="right">1.02</td>
 <td align="right">1.22</td>
@@ -595,8 +595,8 @@ gee_poi_output</code></pre>
 </tr>
 <tr class="even">
 <td>pop_density</td>
-<td align="right">0.20</td>
-<td align="right">0.07</td>
+<td align="right">-4.40</td>
+<td align="right">0</td>
 <td align="right">0.00</td>
 <td align="right">1.00</td>
 <td align="right">1.00</td>
@@ -607,6 +607,38 @@ gee_poi_output</code></pre>
 </tr>
 </tbody>
 </table>
+<p>However, we see that when controlling for percent African Americans comprising a community, the association between <code>pct_eng</code> and <code>evictions</code> flips. Above, we see that as <code>pct_eng</code> - the percentage of individuals who speak English less than ‘Very Well’- goes up, eviction rates decrease, on average.</p>
+<p>African Americans are a predominantly English-speaking community in the US but are nonetheless more vulnerable to evictions than White individuals. In this way, the relationship between <code>pct_eng</code> and <code>evictions</code> was actually being confounded by the percentage of African Americans in a community: a group with high rates of English fluency, and a predominant population in many areas of Brooklyn, was still experiencing higher rates of eviction.</p>
+<p>Thus, after controlling for <code>pct_af_am</code>, we see the following estimates for <code>pct_eng</code> predicting <code>evictions</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">b0_est</th>
+<th align="right">b0_p</th>
+<th align="right">b1_est</th>
+<th align="right">RR</th>
+<th align="right">RR_10</th>
+<th align="right">b1_p</th>
+<th align="right">year_b2_est</th>
+<th align="right">year_RR</th>
+<th align="right">year_p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">-5.72</td>
+<td align="right">0</td>
+<td align="right">0.01</td>
+<td align="right">1.01</td>
+<td align="right">1.08</td>
+<td align="right">0</td>
+<td align="right">0.02</td>
+<td align="right">1.02</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>As we can see, the association has been flipped, and the relationship between English non-fluency and eviction is positive, controlling for percentage of African Americans.</p>
 <p><strong>Example Interpretations of Parameter Estimate</strong></p>
 <ul>
 <li>For the exponentiated beta estimate (<code>b1_est</code>) for <code>pct_nonwhite</code>: For every 1 percent increase in nonwhite residents, the population-average eviction rate is expected to increase by 2.2 percent, on average, controlling for year (RR = 1.022, 95% CI [to be calculated by modifying code]). Given a 10 percent increase in nonwhite residents, we would expect the population-average eviction rate to increase by 22 percent, on average, controlling for year (represented by <code>RR_10</code>).</li>
