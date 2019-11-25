@@ -19,6 +19,7 @@ library(devtools)
 library(leaflet)
 library(maptools)
 library(BAMMtools)
+library(patchwork)
 
 ```
 
@@ -50,12 +51,17 @@ neighborhood_data_prep = eviction_data %>%
     tract_weight = population/neighb_pop,
     eviction_discrepancy = eviction_filing_rate - eviction_rate,
     weighted_eviction_discrep = eviction_discrepancy*tract_weight,
-    weighted_eviction_rate = eviction_rate*tract_weight)
+    weighted_eviction_rate = eviction_rate*tract_weight,
+    pct_nonwhite = 100 - pct_white,
+    weighted_pct_nonwhite = pct_nonwhite*tract_weight,
+    weighted_povertyrate = poverty_rate*tract_weight)
 
 neighborhood_data = neighborhood_data_prep %>% 
   summarize(
     wt_eviction_rate = as.numeric(sum(weighted_eviction_rate)),
-    wt_eviction_rate_discrep = sum(weighted_eviction_discrep)) %>% 
+    wt_eviction_rate_discrep = sum(weighted_eviction_discrep),
+    wt_pct_nonwhite = sum(weighted_pct_nonwhite),
+    wt_povertyrate = sum(weighted_povertyrate)) %>% 
   ungroup() %>% 
   mutate(neighborhood = as.factor(neighborhood))
 
@@ -125,8 +131,70 @@ Map of Eviction rate/filing discrepancy by neighborhood
 
 Bar chart of eviction rate/filing discrepancy
 ```{r}
+bar_chart_evictions = neighborhood_data %>%
+  select(neighborhood, wt_eviction_rate, wt_eviction_rate_discrep) %>%
+  top_n(15, wt_eviction_rate) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate)) %>%
+  pivot_longer(
+    cols = starts_with("wt"),
+    names_to = "rate_type",
+    names_prefix = "wt_",
+    values_to = "rates") %>% 
+  group_by(neighborhood) %>% 
+  arrange(desc(rates)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = neighborhood, y = rates, fill = rate_type)) +
+    geom_bar(position = "stack", stat = "identity") +
+    coord_flip()
+
+#HOW TO WTICH RATE AND RATE DISCREP ON THE BAR
+
 
 ```
 
+Bar chart of eviction rate
+```{r}
+barchart_evictions = neighborhood_data %>%
+  top_n(15, wt_eviction_rate) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate)) %>% 
+  ggplot(aes(x = neighborhood, y = wt_eviction_rate)) +
+    geom_bar(stat = "identity") +
+    coord_flip()
+  
+```
 
+Bar chart of eviction filing/rate discrepancies
+```{r}
+bar_chart_eviction_discrep = neighborhood_data %>%
+  top_n(15, wt_eviction_rate_discrep) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate_discrep)) %>% 
+  ggplot(aes(x = neighborhood, y = wt_eviction_rate_discrep)) +
+    geom_bar(stat = "identity") +
+    coord_flip()
+
+```
+
+Bar chart of pct nonwhite
+```{r}
+bar_chart_pct_nonwhite = neighborhood_data %>%
+  top_n(15, wt_pct_nonwhite) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_pct_nonwhite)) %>% 
+  ggplot(aes(x = neighborhood, y = wt_pct_nonwhite)) +
+    geom_bar(stat = "identity") +
+    coord_flip()
+
+```
+
+Bar chart of poverty rates
+```{r}
+bar_chart_poverty = neighborhood_data %>%
+  top_n(15, wt_povertyrate) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_povertyrate)) %>% 
+  ggplot(aes(x = neighborhood, y = wt_povertyrate)) +
+    geom_bar(stat = "identity") +
+    coord_flip()
+
+(barchart_evictions + bar_chart_eviction_discrep) / (bar_chart_pct_nonwhite + bar_chart_poverty)
+
+```
 
