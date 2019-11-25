@@ -19,6 +19,7 @@ library(devtools)
 library(leaflet)
 library(maptools)
 library(BAMMtools)
+
 ```
 
 ```{r}
@@ -53,11 +54,13 @@ neighborhood_data_prep = eviction_data %>%
 
 neighborhood_data = neighborhood_data_prep %>% 
   summarize(
-    wt_eviction_rate = sum(weighted_eviction_rate),
+    wt_eviction_rate = as.numeric(sum(weighted_eviction_rate)),
     wt_eviction_rate_discrep = sum(weighted_eviction_discrep)) %>% 
   ungroup() %>% 
   mutate(neighborhood = as.factor(neighborhood))
-  
+
+neighborhood_data <- within(neighborhood_data, wt_eviction_rate[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
+neighborhood_data <- within(neighborhood_data, wt_eviction_rate_discrep[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
 
 ```
 
@@ -93,7 +96,7 @@ getJenksBreaks(neighborhood_map$wt_eviction_rate, 5)
 eviction_rate_bins = c(0.2, 1.0, 1.8, 2.7, 3.6)
 
 #set color palette
-eviction_palette = colorBin('Reds', bins = eviction_rate_bins, na.color = '#aaff56')
+eviction_palette = colorBin('Reds', bins = eviction_rate_bins, na.color = '#d9d9d9')
 ```
 
 Map of Eviction Rates by Neighborhood
@@ -112,7 +115,18 @@ leaflet::leaflet(data = neighborhood_map_crs) %>%
                 values = ~wt_eviction_rate,
                 title = 'Eviction rates in Brooklyn by neighborhood',
                 opacity = 1)
-              
+
 ```
 
 Map of Eviction rate/filing discrepancy by neighborhood
+```{r}
+
+```
+
+Bar chart of eviction rate/filing discrepancy
+```{r}
+
+```
+
+
+
