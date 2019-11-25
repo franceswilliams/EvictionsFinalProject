@@ -529,3 +529,92 @@ gee_output
     appears to decrease by 12.94, and this relationship is significant
     at the 5% level. However, this relationship appears to be
     attenuating over time.
+
+<!-- end list -->
+
+``` r
+## poisson distribution of counts (and rates)
+joined_data_bklyn_nomissing %>% 
+  ggplot(aes(x = evictions)) + 
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](Data-Import-and-Cleaning_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+joined_data_bklyn_nomissing %>% 
+  ggplot(aes(x = eviction_rate)) + 
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](Data-Import-and-Cleaning_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+
+``` r
+## trying glm with Poisson
+univariate_poi = function(x){
+  
+  gee_poi = geeglm(evictions ~ offset(log(renter_occupied_households)) + x + year + year*x, ## here i removed the int term
+                   data = joined_data_bklyn_nomissing, 
+                   id = geoid, 
+                   family = poisson, 
+                   corstr = "ar1") %>% ## ar(1) corstr due to autocorrelation in data across time
+  broom::tidy(conf.int = FALSE, 
+              conf.level = 0.95,
+              exponentiate = FALSE, 
+              quick = FALSE)
+
+  # tibble(
+  #   b0_est = gee_poi[[1,2]],
+  #   b0_p = gee_poi[[1,5]],
+  #   b1_est = gee_poi[[2,2]],
+  #   b1_p = gee_poi[[2,5]],
+  #   year_est = gee_poi[[3,2]],
+  #   year_p = gee_poi[[3,5]],
+  #   # interaction_est = gee_poi[[4,2]], ## removed the int term
+  #   # interaction_p = gee_poi[[4,5]]
+  # )
+  
+}
+
+pred_list = list("pct_eng" = pull(joined_data_bklyn_nomissing, pct_eng), 
+                 "rent_burden" = pull(joined_data_bklyn_nomissing, rent_burden), 
+                 "pct_nonwhite" = pull(joined_data_bklyn_nomissing, pct_nonwhite_racedata), 
+                 "pop_density" = pull(joined_data_bklyn_nomissing, total_pop_densitydata)
+                 )
+
+gee_poi_output = map(pred_list, univariate_poi) %>%
+  do.call(rbind, .) %>%
+  knitr::kable(digits = 2)
+
+gee_poi_output
+```
+
+|                 | term        | estimate | std.error | statistic | p.value |
+| --------------- | :---------- | -------: | --------: | --------: | ------: |
+| pct\_eng.1      | (Intercept) |   \-4.77 |     21.50 |      0.05 |    0.82 |
+| pct\_eng.2      | x           |     3.15 |      0.84 |     14.06 |    0.00 |
+| pct\_eng.3      | year        |     0.00 |      0.01 |      0.00 |    0.97 |
+| pct\_eng.4      | x:year      |     0.00 |      0.00 |     14.24 |    0.00 |
+| rent\_burden.1  | (Intercept) |   147.79 |     96.15 |      2.36 |    0.12 |
+| rent\_burden.2  | x           |   \-2.53 |      2.67 |      0.90 |    0.34 |
+| rent\_burden.3  | year        |   \-0.08 |      0.05 |      2.52 |    0.11 |
+| rent\_burden.4  | x:year      |     0.00 |      0.00 |      0.91 |    0.34 |
+| pct\_nonwhite.1 | (Intercept) |   132.33 |     24.78 |     28.51 |    0.00 |
+| pct\_nonwhite.2 | x           |   \-2.82 |      0.35 |     65.20 |    0.00 |
+| pct\_nonwhite.3 | year        |   \-0.07 |      0.01 |     31.12 |    0.00 |
+| pct\_nonwhite.4 | x:year      |     0.00 |      0.00 |     66.12 |    0.00 |
+| pop\_density.1  | (Intercept) |   254.09 |     47.39 |     28.74 |    0.00 |
+| pop\_density.2  | x           |   \-0.05 |      0.01 |     15.03 |    0.00 |
+| pop\_density.3  | year        |   \-0.13 |      0.02 |     29.71 |    0.00 |
+| pop\_density.4  | x:year      |     0.00 |      0.00 |     15.01 |    0.00 |
+
+**Questions**
+
+  - Adding/removing the interaction term with time changes the beta
+    estimate significantly. Something I need to look more into.
+  - Making sure the model is set up correctly with `geeglm`
+  - Compare AIC or cross-validate models with/out interaction term
