@@ -25,7 +25,6 @@ In this section, we'll import eviction data, which includes eviction rates and o
 # contains years 2000 - 2016
 # n = 1880 per year (1880 census tracts)
 
-
 eviction = 
   read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 

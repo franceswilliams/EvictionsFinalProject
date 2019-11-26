@@ -41,9 +41,9 @@ census_tracts@data = left_join(census_tracts@data, eviction_data, by = c("fips_1
 ```
 
 ```{r}
-census_tracts_crs = spTransform(census_tracts, CRS("+init=epsg:4326"))
+census_tracts_crs_1 = spTransform(census_tracts, CRS("+init=epsg:4326"))
 
-writeOGR(census_tracts_crs, './mapping_files/census_tracts_geojson', layer = 'census_tracts', driver = 'GeoJSON')
+#writeOGR(census_tracts_crs, './mapping_files/census_tracts_geojson', layer = 'census_tracts', driver = 'GeoJSON')
 ```
 
 ```{r}
@@ -67,7 +67,7 @@ eviction_palette = colorBin('Greens', bins = eviction_rate_bins, na.color = '#aa
 
 Creating choropleth
 ```{r}
-leaflet::leaflet(data = census_tracts_crs) %>% 
+leaflet::leaflet(data = census_tracts_crs_1) %>% 
   addProviderTiles('CartoDB.Positron') %>% 
   addPolygons(
     fillColor = ~eviction_palette(eviction_rate),
