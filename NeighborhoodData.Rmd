@@ -40,7 +40,8 @@ Merging with evictions data/cleaning, weighting, and summarizing neighborhood-le
 eviction_data = read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
   filter(year == 2016) %>% 
-  mutate(geoid = as.character(geoid)) %>% 
+  mutate(
+    geoid = as.character(geoid)) %>% 
   filter(parent_location == "Kings County, New York") %>% 
   left_join(neighborhood_df, by = c("geoid" = "geo_id"))
 
@@ -129,7 +130,7 @@ Map of Eviction rate/filing discrepancy by neighborhood
 
 ```
 
-Bar chart of eviction rate/filing discrepancy
+Stacked bar chart of eviction rate/filing discrepancy
 ```{r}
 bar_chart_evictions = neighborhood_data %>%
   select(neighborhood, wt_eviction_rate, wt_eviction_rate_discrep) %>%
@@ -147,8 +148,8 @@ bar_chart_evictions = neighborhood_data %>%
     geom_bar(position = "stack", stat = "identity") +
     coord_flip()
 
-#HOW TO WTICH RATE AND RATE DISCREP ON THE BAR
-
+#HOW TO SWTICH RATE AND RATE DISCREP ON THE BAR
+bar_chart_evictions
 
 ```
 
@@ -156,10 +157,14 @@ Bar chart of eviction rate
 ```{r}
 barchart_evictions = neighborhood_data %>%
   top_n(15, wt_eviction_rate) %>% 
-  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate)) %>% 
-  ggplot(aes(x = neighborhood, y = wt_eviction_rate)) +
+  mutate(
+    neighborhood = fct_reorder(neighborhood, wt_eviction_rate),
+    highlight = ifelse(neighborhood == "Brownsville" | neighborhood == "East New York (Pennsylvania Ave)" | neighborhood == "Ocean Hill" | neighborhood == "East New York" | neighborhood == "Crown Heights North", "yes", "no")) %>% 
+  ggplot(aes(x = neighborhood, y = wt_eviction_rate, fill = highlight)) +
     geom_bar(stat = "identity") +
-    coord_flip()
+    scale_fill_manual(values = c("yes" = "red", "no" = "gray"), guide = FALSE) +
+    coord_flip() + 
+    labs(y = "Eviction Rate", x = "", title = "Brooklyn Neighborhood Characteristics, 2016")
   
 ```
 
@@ -167,10 +172,14 @@ Bar chart of eviction filing/rate discrepancies
 ```{r}
 bar_chart_eviction_discrep = neighborhood_data %>%
   top_n(15, wt_eviction_rate_discrep) %>% 
-  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate_discrep)) %>% 
-  ggplot(aes(x = neighborhood, y = wt_eviction_rate_discrep)) +
+  mutate(
+    neighborhood = fct_reorder(neighborhood, wt_eviction_rate_discrep),
+    highlight = ifelse(neighborhood == "Brownsville" | neighborhood == "East New York (Pennsylvania Ave)" | neighborhood == "Ocean Hill" | neighborhood == "East New York" | neighborhood == "Crown Heights North", "yes", "no")) %>% 
+  ggplot(aes(x = neighborhood, y = wt_eviction_rate_discrep, fill = highlight)) +
     geom_bar(stat = "identity") +
-    coord_flip()
+    scale_fill_manual(values = c("yes" = "red", "no" = "gray"), guide = FALSE) +
+    coord_flip() +
+    labs(y = "Eviction Filing/Rate Discrepancy", x = "")
 
 ```
 
@@ -178,10 +187,14 @@ Bar chart of pct nonwhite
 ```{r}
 bar_chart_pct_nonwhite = neighborhood_data %>%
   top_n(15, wt_pct_nonwhite) %>% 
-  mutate(neighborhood = fct_reorder(neighborhood, wt_pct_nonwhite)) %>% 
-  ggplot(aes(x = neighborhood, y = wt_pct_nonwhite)) +
+  mutate(
+    neighborhood = fct_reorder(neighborhood, wt_pct_nonwhite),
+    highlight = ifelse(neighborhood == "Brownsville" | neighborhood == "East New York (Pennsylvania Ave)" | neighborhood == "Ocean Hill" | neighborhood == "East New York" | neighborhood == "Crown Heights North", "yes", "no")) %>% 
+  ggplot(aes(x = neighborhood, y = wt_pct_nonwhite, fill = highlight)) +
     geom_bar(stat = "identity") +
-    coord_flip()
+    scale_fill_manual(values = c("yes" = "red", "no" = "gray"), guide = FALSE) +
+    coord_flip() +
+    labs(y = "Percent Nonwhite", x = "")
 
 ```
 
@@ -189,12 +202,18 @@ Bar chart of poverty rates
 ```{r}
 bar_chart_poverty = neighborhood_data %>%
   top_n(15, wt_povertyrate) %>% 
-  mutate(neighborhood = fct_reorder(neighborhood, wt_povertyrate)) %>% 
-  ggplot(aes(x = neighborhood, y = wt_povertyrate)) +
+  mutate(
+    neighborhood = fct_reorder(neighborhood, wt_povertyrate),
+    highlight = ifelse(neighborhood == "Brownsville" | neighborhood == "East New York (Pennsylvania Ave)" | neighborhood == "Ocean Hill" | neighborhood == "East New York" | neighborhood == "Crown Heights North", "yes", "no")) %>% 
+  ggplot(aes(x = neighborhood, y = wt_povertyrate, fill = highlight)) +
     geom_bar(stat = "identity") +
-    coord_flip()
+    scale_fill_manual(values = c("yes" = "red", "no" = "gray"), guide = FALSE) +
+    coord_flip() +
+    labs(y = "Poverty Rate", x = "")
 
 (barchart_evictions + bar_chart_eviction_discrep) / (bar_chart_pct_nonwhite + bar_chart_poverty)
 
 ```
+
+The bar charts above take the 10 highest neighborhood values for the categories of eviction rates, eviction filing/rate discrepancy, percent non-white, and poverty rate. Five neighborhoods appear in all four charts. 
 
