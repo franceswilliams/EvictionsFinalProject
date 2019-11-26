@@ -15,7 +15,6 @@ library(tidyverse)
 library(plotly)
 ```
 
-Relevant data import
 
 ```{r}
 neighborhood_df = 
@@ -83,9 +82,13 @@ Column {data-width=650}
 
 ```{r}
 
-renderPrint({ 
-  input[["neighborhood_choice"]]
-})
+
+  brooklyn_data %>%
+    group_by(year) %>%
+    ungroup() %>% 
+    plot_ly(x=~year, y=~wt_eviction_rate, type="scatter", mode="lines+markers") %>% 
+    layout(title="Eviction Rate (%) Over Time by Brooklyn Neighborhood")
+
 
 ```
 
