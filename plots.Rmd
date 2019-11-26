@@ -101,11 +101,15 @@ line_graph_3 = line_graph_2 %>%
 line_graph_3 <- within(line_graph_3, wt_eviction_rate[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
 line_graph_3 <- within(line_graph_3, wt_eviction_rate_discrep[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
 
+
+
 line_graph_3 %>% 
   group_by(neighborhood, year) %>% 
-  ggplot(aes(x=year, y=wt_eviction_rate, group=neighborhood, color = neighborhood)) + geom_point() + geom_line() 
+   ungroup() %>% 
+    plot_ly(x=~year, y=~wt_eviction_rate, group=~neighborhood, type="scatter", color=~neighborhood, mode="lines+markers") %>% 
+    layout(title="Eviction Rate (%) Over Time by Brooklyn Neighborhood")
 
-# ^^ very busy spaghetti plot - looking into ways to make it more interactive and nice
+# ^^ very busy spaghetti plotly - looking into ways to make it more interactive and nice
 
 
 
