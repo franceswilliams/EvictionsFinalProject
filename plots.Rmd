@@ -109,7 +109,7 @@ line_graph_3 %>%
     plot_ly(x=~year, y=~wt_eviction_rate, group=~neighborhood, type="scatter", color=~neighborhood, mode="lines+markers") %>% 
     layout(title="Eviction Rate (%) Over Time by Brooklyn Neighborhood")
 
-# ^^ very busy spaghetti plotly - looking into ways to make it more interactive and nice
+# This preliminary plotly looks extremely busy....attempting to incorporate Shiny to make it not so busy :)
 
 
 
