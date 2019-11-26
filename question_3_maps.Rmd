@@ -1,7 +1,5 @@
 ---
 title: "Question 3 maps"
-author: "Gloria Hu (gh2518)"
-date: "11/26/2019"
 output: html_document
 ---
 
