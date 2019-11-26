@@ -147,6 +147,7 @@ bar_chart_evictions = neighborhood_data %>%
     geom_bar(position = "stack", stat = "identity") +
     coord_flip()
 
+bar_chart_evictions
 #HOW TO WTICH RATE AND RATE DISCREP ON THE BAR
 
 
