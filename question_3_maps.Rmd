@@ -98,5 +98,7 @@ leaflet::leaflet(data = census_tracts_crs) %>%
     lat = ~ census_tracts_crs$lat, 
     lng = ~ census_tracts_crs$long,
     color = ~ eng_palette(census_tracts_crs$pct_eng),
-    radius = ((census_tracts_crs$pct_eng)^2)/1000)
+    radius = ((census_tracts_crs$pct_eng)^2)/1000,
+    weight = 1
+    )
 ```
