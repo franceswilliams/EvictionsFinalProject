@@ -86,7 +86,7 @@ Column {data-width=650}
   brooklyn_data %>%
     group_by(year) %>%
     ungroup() %>% 
-    plot_ly(x=~year, y=~wt_eviction_rate, type="scatter", mode="lines+markers") %>% 
+    plot_ly(x=~year, y=~wt_eviction_rate, type="scatter", color=~neighborhood, mode="lines+markers") %>% 
     layout(title="Eviction Rate (%) Over Time by Brooklyn Neighborhood")
 
 
