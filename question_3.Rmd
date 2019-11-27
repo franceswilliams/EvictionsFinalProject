@@ -105,7 +105,7 @@ pred_poi_list = list("pct_eng" = pull(joined_data_bklyn_nomissing, pct_eng),
                      "pop_density" = pull(joined_data_bklyn_nomissing, total_pop_densitydata)
                      )
 
-gee_poi_output = map(pred_list, univariate_poi) %>%
+gee_poi_output = map(pred_poi_list, univariate_poi) %>%
   do.call(rbind, .) %>%
   knitr::kable(digits = 2,
                caption = "Univarable GEE parameter estimates: predicted change in rate of evictions (standardized by area-specific number of renter-occupied households)")
@@ -197,9 +197,42 @@ Variables to test:
 
 ```{r}
 ## use full dataset
-joined_data_bklyn_nomissing %>% 
-  ## build a gee
-  ## put into gee_stepper
+full_fit =
+  geeglm(evictions ~ 
+           offset(log(renter_occupied_households)) + years_since_2010 +
+           pct_eng + rent_burden + pct_nonwhite_racedata + density + ## hypothesized
+           black + aian + asian + nhpi + other + ## race
+           poverty_rate + pct_renter_occupied + median_gross_rent + median_household_income + median_property_value,
+         data = joined_data_bklyn_nomissing,
+         id = geoid,
+         family = poisson,
+         corstr = "ar1")
 
+gee_stepper_o(full_fit, formula(full_fit)) ## customized function to automatically include offset and time covariate
+
+```
+
+Covariates selected by stepwise selection (using QIC):  
+  * [`offset`] - held constant
+  * [`years_since_2010`] - held constant
+  * `rent_burden`
+  * `density`
+  * `nhpi`
+  * `black`
+  * `other`
+  * `poverty_rate`
+  * `median_household_income`
+  * `median_gross_rent`
+  * `median_property_value`
+  * `pct_renter_occupied`
+
+Final formula:
+```{r}
+step_model = 
+  geeglm(formula = evictions ~ years_since_2010 + black + median_property_value + 
+    other + median_household_income + density + rent_burden + 
+    poverty_rate + nhpi + median_gross_rent + pct_renter_occupied + 
+    offset(log(renter_occupied_households)), family = poisson, 
+    data = joined_data_bklyn_nomissing, id = geoid, corstr = "ar1")
 ```
 

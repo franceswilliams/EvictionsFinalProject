@@ -321,16 +321,17 @@ race_2016 =
   read.csv("./data/ACS_16_5YR_DP05_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2016", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc78, hc03_vc79, hc03_vc80, hc03_vc81, hc03_vc82, hc03_vc83) %>%
+  select(year, geo_id, geo_id2, hc03_vc78, hc03_vc79, hc03_vc80, hc03_vc81, hc03_vc82, hc03_vc83, hc03_vc87) %>% ## ADDED HISPANIC
   filter(geo_id != "Id") %>%
-  rename(white = hc03_vc78, black = hc03_vc79, aian = hc03_vc80, asian = hc03_vc81, nhpi = hc03_vc82, other = hc03_vc83) %>%
+  rename(white = hc03_vc78, black = hc03_vc79, aian = hc03_vc80, asian = hc03_vc81, nhpi = hc03_vc82, other = hc03_vc83, hisp = hc03_vc87) %>%
   mutate(
     white = as.numeric(as.character(white)),
     black = as.numeric(as.character(black)),
     aian = as.numeric(as.character(aian)),
     asian = as.numeric(as.character(asian)),
     nhpi = as.numeric(as.character(nhpi)),
-    other = as.numeric(as.character(other))
+    other = as.numeric(as.character(other)),
+    hisp = as.numeric(as.character(hisp))
   )
 
 race_data = 
@@ -420,5 +421,10 @@ rm(area,
    englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016,
    race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016,
    filenames_DP05)
+```
+
+```{r}
+## TO DO
+  ## Finish filling in Hispanic on DP05 tables!
 ```
 
