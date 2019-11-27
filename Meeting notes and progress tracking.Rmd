@@ -53,6 +53,23 @@ Gloria
 * Question 3
 * Website (two weeks from now)
 
+## 11262019 Check-in meeting
+Workflow
+* Move files to website as ready- new repo
+
+### Assignments (Sunday 1 December)
+Will
+* Question 3- regressions model building & Shiny, website
+
+Frances
+* Question 2- almost done, make website page
+
+Naama
+* Question 1- building shiny plotly with checkboxes, shiny slider ()
+
+Gloria
+* Question 3- make four maps based on one year of data (2016), pending regression results
+
 ### Info on GEOIDs
 
 [Census Bureau](https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html) - scroll almost all the way to the bottom
