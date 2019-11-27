@@ -75,16 +75,12 @@ Loading neighborhood shapefile from NYC open data
 ```{r}
 neighborhood_map = readOGR(dsn = "mapping_files/NYC_BKneighborhoods.shp", encoding = "UTF-8")
 
-#neighborhood_map@data = neighborhood_map@data %>% 
-#  filter(boro_name == "Brooklyn")
 
 neighborhood_map@data = left_join(neighborhood_map@data, neighborhood_data, by = c("ntaname" = "neighborhood"))
 ```
 
 ```{r}
 neighborhood_map_crs = spTransform(neighborhood_map, CRS("+init=epsg:4326"))
-
-#writeOGR(neighborhood_map_crs, './mapping_files/neighborhood_map_geojson', layer = 'neighborhoods', driver = 'GeoJSON')
 ```
 
 ```{r}
@@ -147,6 +143,7 @@ bar_chart_evictions = neighborhood_data %>%
   ggplot(aes(x = neighborhood, y = rates, fill = rate_type)) +
     geom_bar(position = "stack", stat = "identity") +
     coord_flip()
+
 
 #HOW TO SWTICH RATE AND RATE DISCREP ON THE BAR
 bar_chart_evictions
