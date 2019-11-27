@@ -1,0 +1,26 @@
+---
+title: "Overview"
+output: html_document
+---
+
+<style type="text/css">
+
+h1.title {
+  text-align: center;
+}
+
+</style>
+
+## Motivation
+
+## Questions
+
+## Data
+
+### Sources
+
+### Cleaning
+
+### Variables of interest
+
+## Methods

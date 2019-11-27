@@ -1,0 +1,108 @@
+---
+title: "Shiny Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(readxl)
+library(tidyverse)
+library(plotly)
+```
+
+
+```{r}
+neighborhood_df = 
+  read_excel("./data/NYC_neighborhoods_by_censustract_2010.xlsx", 
+             skip = 5, 
+             col_names = c("borough", "county_code", "boro_code", "census_tract", "PUMA", "nta_code", "neighborhood")
+             ) %>% 
+#creating 11 digit FIPS code by pasting country code (36) with `county_code` and `census_tract`
+  mutate(geo_id = paste0("36", county_code, census_tract)
+  )
+
+brooklyn_data = read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  mutate(geoid = as.character(geoid)) %>% 
+  filter(parent_location == "Kings County, New York") %>% 
+  left_join(neighborhood_df, by = c("geoid" = "geo_id"))
+
+brooklyn_data = brooklyn_data %>% 
+  group_by(neighborhood, year) %>% 
+  mutate(
+    neighb_pop = sum(population),
+    tract_weight = population/neighb_pop,
+    eviction_discrepancy = eviction_filing_rate - eviction_rate,
+    weighted_eviction_discrep = eviction_discrepancy*tract_weight,
+    weighted_eviction_rate = eviction_rate*tract_weight,
+    pct_nonwhite = 100 - pct_white,
+    weighted_pct_nonwhite = pct_nonwhite*tract_weight,
+    weighted_povertyrate = poverty_rate*tract_weight)
+ 
+
+
+brooklyn_data = brooklyn_data %>% 
+  summarize(
+    wt_eviction_rate = as.numeric(sum(weighted_eviction_rate)),
+    wt_eviction_rate_discrep = sum(weighted_eviction_discrep),
+    wt_pct_nonwhite = sum(weighted_pct_nonwhite),
+    wt_povertyrate = sum(weighted_povertyrate)) %>% 
+  ungroup() %>% 
+  mutate(neighborhood = as.factor(neighborhood))
+
+brooklyn_data <- within(brooklyn_data, wt_eviction_rate[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
+brooklyn_data <- within(brooklyn_data, wt_eviction_rate_discrep[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
+
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+neighborhoods = brooklyn_data %>% distinct(neighborhood) %>% pull()
+
+
+# selectInput widget
+selectInput(
+  "neighborhood_choice", 
+  label = h3("Select Neighborhood"),
+  choices = neighborhoods, selected = "Williamsburg")
+
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+
+  brooklyn_data %>%
+    group_by(year) %>%
+    ungroup() %>% 
+    plot_ly(x=~year, y=~wt_eviction_rate, type="scatter", mode="lines+markers") %>% 
+    layout(title="Eviction Rate (%) Over Time by Brooklyn Neighborhood")
+
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```

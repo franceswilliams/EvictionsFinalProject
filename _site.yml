@@ -1,0 +1,25 @@
+name: "Evicted in Brooklyn"
+output_dir: "."
+navbar:
+  title: "Home"
+  left:
+    - text: "Overview"
+      href: overview.html
+    - text: "Rates Over Time"
+      href: question_1.html
+    - text: "Filings vs. Evictions"
+      href: question_2.html
+    - text: "Model Building"
+      href: question_3.html
+  right:
+    - text: "Interactive Model"
+      href: shiny_app
+    - text: "Conclusions"
+      href: conclusions.html
+    - icon: fa-github fa-lg
+      href: https://github.com/simmwill/brooklyn_evictions.github.io
+output:
+  html_document:
+    theme: cosmo
+    includes:
+      after_body: footer.html

@@ -8,7 +8,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### **Project Title:** Demographic and housing correlates of evictions in NYC, 2000-2016
+### **Project Title:** Demographic and housing correlates of evictions in Brooklyn, 2010-2016
 
 ### **Project Overview:**
 
