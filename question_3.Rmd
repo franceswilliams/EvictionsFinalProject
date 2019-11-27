@@ -187,13 +187,38 @@ __Next Steps__
     + Cross-validation of models
   * Shiny app that builds model based on any variable we have (output = # evictions per 100 renter households per year)
 
+***
+
+## Correlation Plot
+
+```{r}
+joined_data_bklyn_nomissing %>% 
+  select(-pct_nonwhite_racedata, -pct_af_am, am_ind_ak_native = aian) %>% 
+  select_if(is.numeric) %>% 
+  cor() %>% 
+  corrplot::corrplot(type = "lower",
+                     method = "square", 
+                     addCoef.col = "black", 
+                     diag = FALSE, 
+                     number.cex = .7,
+                     tl.col = "black",
+                     tl.cex = .9)
+```
+
+
+## Hypothesized Model
+
+```{r}
+hyp_fit = 
+  geeglm(evictions ~
+           )
+
+## need to include `black` since confounds pct_eng -> evictions relationship
+  ## but `black` also collinear with `pct_nonwhite`, which we want as a predictor
+  ## solution: include all races?
+```
+
 ## Model Fitting using `gee_stepper`
-
-Variables to test:
-
-  * `years_since_2010`
-  * 
-
 
 ```{r}
 ## use full dataset
