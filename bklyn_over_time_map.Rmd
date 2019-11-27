@@ -86,31 +86,20 @@ joined_data_bklyn_nomissing =
 ```
 
 
+Interactivity {.sidebar}
+-----------------------------------------------------------------------
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
-```{r}
+# Create slider widget
 
-# Create list of years 'years'
-
-years = joined_data_bklyn %>% distinct(year) %>% pull()
-
-# Create years drop-down widget
-
-selectInput(
-  "year_choice", 
-  label = h3("Select Year"),
-  choices = years, selected = "2000")
-```
-
-
-```{r}
-renderPrint({ 
-  input[["year_choice"]]
-})
+sliderInput("years", "year of observation",
+    min = 2000, max = 2016, step=1, value = 2000
+  )
 ```
 
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 
 # Loading census tract shapefiles from NYC OpenData:
@@ -138,14 +127,17 @@ census_tracts@data =
 ```
 
 
+Figure 1 {data-width=650}
+-----------------------------------------------------------------------
+### Figure 1
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 renderLeaflet({
   
   joined_data_bklyn_year = 
   joined_data_bklyn  %>%
-  filter(year==input[["year_choice"]])
+  filter(year==input[["years"]])
 
 # Joining data and shapefiles
 census_tracts@data = left_join(census_tracts@data, joined_data_bklyn_year, by = c("fips_11dig" = "geoid"))
