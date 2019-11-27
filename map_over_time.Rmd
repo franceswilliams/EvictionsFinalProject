@@ -142,16 +142,6 @@ eviction_palette = colorBin('Blues', bins = eviction_rate_bins, na.color = '#d9d
 ```
 
 
-```{r}
-leaflet::leaflet(data = census_tracts_crs) %>% 
-  addProviderTiles('CartoDB.Positron') %>% 
-  addPolygons(
-    fillColor = ~eviction_palette(eviction_rate),
-    fillOpacity = 0.8,
-    color = "BDBDC3",
-    weight = 1,
-    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) 
-```
 
 
 
