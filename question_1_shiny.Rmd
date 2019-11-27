@@ -9,3 +9,90 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(tidyverse)
+library(readxl)
+library(plotly)
+library(rgdal)
+library(maps)
+library(devtools)
+library(leaflet)
+library(maptools)
+library(BAMMtools)
+library(patchwork)
+```
+
+
+```{r dataprep}
+# Loading in Brooklyn data
+joined_data_bklyn_2010 = 
+  readRDS('./data/joined_data_bklyn') %>%
+  filter(year == "2010")
+
+# Loading census tract shapefiles from NYC OpenData:
+census_tracts = readOGR(dsn = "mapping_files/censustracts2010.shp", encoding = "UTF-8") 
+
+census_tracts = 
+  census_tracts[census_tracts$boro_name == "Brooklyn", ]
+
+writeOGR(census_tracts,"./mapping_files","census_temp", driver = "ESRI Shapefile", overwrite_layer = TRUE)
+census_tracts = readOGR("./mapping_files","census_temp")
+
+# Constructing geoid for merging
+census_tracts@data = 
+  census_tracts@data %>% 
+  mutate(
+    county_code = as.character(recode(boro_code, "1" = "061", "2" = "005", "3" = "047", "4" = "081", "5" = "085")),
+    ct2010 = as.character(ct2010),
+    fips_11dig = paste0("36", county_code, ct2010),
+    long = coordinates(spTransform(census_tracts_crs, CRS("+proj=longlat +datum=WGS84")))[,1],
+    lat = coordinates(spTransform(census_tracts_crs, CRS("+proj=longlat +datum=WGS84")))[,2]
+    ) %>%
+  unnest(c(long, lat))
+
+# Joining data and shapefiles
+census_tracts@data = left_join(census_tracts@data, joined_data_bklyn_2010, by = c("fips_11dig" = "geoid"))
+```
+
+```{r}
+census_tracts_crs = spTransform(census_tracts, CRS("+init=epsg:4326"))
+
+# writeOGR(census_tracts_crs, './mapping_files/census_tracts_geojson', layer = 'census_tracts', driver = 'GeoJSON')
+```
+
+```{r}
+#pop up label
+label_popup = paste0(
+  "<strong>Census tract: </strong>",
+  census_tracts_crs$ctlabel,
+  "<br><strong>Eviction rate: </strong>",
+  census_tracts_crs$eviction_rate,
+  "<br><strong> % ESL: </strong>",
+  census_tracts_crs$pct_eng
+)
+
+# get jenks natural breaks
+getJenksBreaks(census_tracts_crs$eviction_rate, 5)
+getJenksBreaks(census_tracts_crs$pct_eng, 5)
+
+#set bins based on natural breaks
+eviction_rate_bins = c(0, 1.23, 2.51, 4.12, 7.62)
+pct_eng_bins = c(0, 14.6, 29.8, 46.9, 82.5)
+
+#set color palette
+eviction_palette = colorBin('Blues', bins = eviction_rate_bins, na.color = '#d9d9d9')
+eng_palette = colorBin('Reds', bins = pct_eng_bins, na.color = '#d9d9d9')
+```
+
+Map of Eviction Rates by Census Tract
+```{r}
+leaflet::leaflet(data = census_tracts_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    popup = label_popup,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) 
+```
