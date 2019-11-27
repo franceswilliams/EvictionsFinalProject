@@ -91,7 +91,7 @@ choices = neighborhoods, selected = "Williamsburg")
 
 Figure 1 {data-width=650}
 -----------------------------------------------------------------------
-### Chart A
+### Figure 1
 
 
 ```{r echo=FALSE}
@@ -112,4 +112,6 @@ renderPlotly({
   
 
 ```
+
+
 
