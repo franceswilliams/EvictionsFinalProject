@@ -1,15 +1,10 @@
 ---
 title: "Question 3 maps"
-author: "Gloria Hu (gh2518)"
-date: "11/26/2019"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
 library(tidyverse)
 library(readxl)
 library(plotly)
@@ -22,14 +17,14 @@ library(BAMMtools)
 library(patchwork)
 ```
 
-```{r dataprep}
+```{r echo=FALSE}
 # Loading in Brooklyn data
 joined_data_bklyn_2010 = 
   readRDS('./data/joined_data_bklyn') %>%
   filter(year == "2010")
 
 # Loading census tract shapefiles from NYC OpenData:
-census_tracts = readOGR(dsn = "mapping_files/censustracts2010.shp", encoding = "UTF-8") 
+census_tracts = readOGR(dsn = "maps/2010-census-tracts.shp", encoding = "UTF-8") 
 
 census_tracts = 
   census_tracts[census_tracts$boro_name == "Brooklyn", ]
@@ -44,8 +39,8 @@ census_tracts@data =
     county_code = as.character(recode(boro_code, "1" = "061", "2" = "005", "3" = "047", "4" = "081", "5" = "085")),
     ct2010 = as.character(ct2010),
     fips_11dig = paste0("36", county_code, ct2010),
-    long = coordinates(spTransform(census_tracts_crs, CRS("+proj=longlat +datum=WGS84")))[,1],
-    lat = coordinates(spTransform(census_tracts_crs, CRS("+proj=longlat +datum=WGS84")))[,2]
+    long = coordinates(spTransform(census_tracts, CRS("+proj=longlat +datum=WGS84")))[,1],
+    lat = coordinates(spTransform(census_tracts, CRS("+proj=longlat +datum=WGS84")))[,2]
     ) %>%
   unnest(c(long, lat))
 
@@ -53,38 +48,74 @@ census_tracts@data =
 census_tracts@data = left_join(census_tracts@data, joined_data_bklyn_2010, by = c("fips_11dig" = "geoid"))
 ```
 
-```{r}
+```{r echo=FALSE}
 census_tracts_crs = spTransform(census_tracts, CRS("+init=epsg:4326"))
 
 # writeOGR(census_tracts_crs, './mapping_files/census_tracts_geojson', layer = 'census_tracts', driver = 'GeoJSON')
 ```
 
-```{r}
-#pop up label
-label_popup = paste0(
+```{r echo=FALSE}
+#Labels
+esl_popup = paste0(
   "<strong>Census tract: </strong>",
   census_tracts_crs$ctlabel,
   "<br><strong>Eviction rate: </strong>",
   census_tracts_crs$eviction_rate,
-  "<br><strong> % ESL: </strong>",
+  "<br><strong>% ESL: </strong>",
   census_tracts_crs$pct_eng
+)
+
+nonwhite_popup = paste0(
+  "<strong>Census tract: </strong>",
+  census_tracts_crs$ctlabel,
+  "<br><strong>Eviction rate: </strong>",
+  census_tracts_crs$eviction_rate,
+  "<br><strong>% non-White: </strong>",
+  census_tracts_crs$pct_nonwhite_racedata
+)
+
+rentburden_popup = paste0(
+  "<strong>Census tract: </strong>",
+  census_tracts_crs$ctlabel,
+  "<br><strong>Eviction rate: </strong>",
+  census_tracts_crs$eviction_rate,
+  "<br><strong>Rent burden: </strong>",
+  census_tracts_crs$rent_burden
+)
+
+popdensity_popup = paste0(
+  "<strong>Census tract: </strong>",
+  census_tracts_crs$ctlabel,
+  "<br><strong>Eviction rate: </strong>",
+  census_tracts_crs$eviction_rate,
+  "<br><strong>Population Density: </strong>",
+  census_tracts_crs$total_pop_densitydata
 )
 
 # get jenks natural breaks
 getJenksBreaks(census_tracts_crs$eviction_rate, 5)
 getJenksBreaks(census_tracts_crs$pct_eng, 5)
+getJenksBreaks(census_tracts_crs$pct_nonwhite_racedata, 5)
+getJenksBreaks(census_tracts_crs$rent_burden, 5)
+getJenksBreaks(census_tracts_crs$total_pop_densitydata, 5)
 
 #set bins based on natural breaks
 eviction_rate_bins = c(0, 1.23, 2.51, 4.12, 7.62)
 pct_eng_bins = c(0, 14.6, 29.8, 46.9, 82.5)
+nonwhite_bins = c(0, 22.9, 49.6, 77.2, 100)
+rentburden_bins = c(13.9, 28.4, 34.6, 42.5, 50.0)
+popdensity_bins = c(22, 2432, 3636, 5124, 8475)
 
 #set color palette
 eviction_palette = colorBin('Blues', bins = eviction_rate_bins, na.color = '#d9d9d9')
 eng_palette = colorBin('Reds', bins = pct_eng_bins, na.color = '#d9d9d9')
+nonwhite_palette = colorBin('Reds', bins = nonwhite_bins, na.color = '#d9d9d9')
+rentburden_palette = colorBin('Reds', bins = rentburden_bins, na.color = '#d9d9d9')
+popdensity_palette = colorBin('Reds', bins = popdensity_bins, na.color = '#d9d9d9')
 ```
 
-Map of Eviction Rates by Census Tract
-```{r}
+Map of Eviction Rates and % ESL speakers, by census tract
+```{r echo=FALSE}
 leaflet::leaflet(data = census_tracts_crs) %>% 
   addProviderTiles('CartoDB.Positron') %>% 
   addPolygons(
@@ -92,10 +123,10 @@ leaflet::leaflet(data = census_tracts_crs) %>%
     fillOpacity = 0.8,
     color = "BDBDC3",
     weight = 1,
-    popup = label_popup,
+    popup = esl_popup,
     highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
   addCircleMarkers(
-    lat = ~ census_tracts_crs$lat, 
+    lat = ~ census_tracts_crs$lat,
     lng = ~ census_tracts_crs$long,
     color = ~ eng_palette(census_tracts_crs$pct_eng),
     radius = ((census_tracts_crs$pct_eng)^2)/800,
@@ -103,4 +134,67 @@ leaflet::leaflet(data = census_tracts_crs) %>%
     )
 ```
 
+<<<<<<< HEAD
 
+=======
+Map of Eviction Rates and % non-White, by census tract
+```{r echo=FALSE}
+leaflet::leaflet(data = census_tracts_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    popup = nonwhite_popup,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
+  addCircleMarkers(
+    lat = ~ census_tracts_crs$lat,
+    lng = ~ census_tracts_crs$long,
+    color = ~ nonwhite_palette(census_tracts_crs$pct_nonwhite_racedata),
+    radius = ((census_tracts_crs$pct_nonwhite_racedata)^1.85)/1000,
+    weight = 1
+    )
+```
+
+
+Map of Eviction Rates and Rent Burden, by census tract
+```{r echo=FALSE}
+leaflet::leaflet(data = census_tracts_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    popup = rentburden_popup,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
+  addCircleMarkers(
+    lat = ~ census_tracts_crs$lat,
+    lng = ~ census_tracts_crs$long,
+    color = ~ rentburden_palette(census_tracts_crs$rent_burden),
+    radius = ((census_tracts_crs$rent_burden)^2)/800,
+    weight = 1
+    )
+```
+
+Map of Eviction Rates and Population Density, by census tract
+```{r echo=FALSE}
+leaflet::leaflet(data = census_tracts_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    popup = rentburden_popup,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
+  addCircleMarkers(
+    lat = ~ census_tracts_crs$lat,
+    lng = ~ census_tracts_crs$long,
+    color = ~ popdensity_palette(census_tracts_crs$total_pop_densitydata),
+    radius = (census_tracts_crs$total_pop_densitydata)/1200,
+    weight = 1
+    )
+```
+>>>>>>> 2538ef1b6dc01edf9bef928f6b0437fbb516ad84
