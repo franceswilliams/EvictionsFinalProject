@@ -99,10 +99,13 @@ Figure 1 {data-width=650}
 
 renderPlotly({ 
 
+brooklyn_data = 
   brooklyn_data %>%
     filter(
       neighborhood == input[["neighborhood_choice"]]
-    ) %>% 
+    ) 
+
+brooklyn_data %>% 
     group_by(year) %>%
     ungroup() %>% 
     plot_ly(x=~year, y=~Eviction_Rate, type="scatter", mode="lines+markers", color = ~neighborhood) %>% 

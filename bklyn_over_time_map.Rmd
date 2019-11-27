@@ -1,0 +1,178 @@
+---
+title: "Eviction Rates in Brooklyn Over Time: Map"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(readxl)
+library(tidyverse)
+library(plotly)
+library(tidyverse)
+library(readxl)
+library(plotly)
+library(rgdal)
+library(maps)
+library(devtools)
+library(leaflet)
+library(maptools)
+library(BAMMtools)
+library(patchwork)
+```
+
+
+```{r echo=FALSE}
+
+eviction = 
+  read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+         population != 0) %>% 
+  
+  ## selecting and renaming variables
+  mutate(pct_nonwhite = (100 - pct_white),
+         geoid = as.character(geoid),
+         year = as.ordered(year)) %>% 
+  select(geoid, year, ## contextual
+         evictions, eviction_filings, eviction_rate, eviction_filing_rate, renter_occupied_households, ## outcomes
+         pct_nonwhite_evictiondata = pct_nonwhite, ## hypothesized predictors
+         poverty_rate, rent_burden, pct_af_am, pct_renter_occupied, median_gross_rent, median_household_income, median_property_value) %>% ## other predictors
+  filter(renter_occupied_households > 10) # census tracts with few renter households were creating eviction rates of 150, 200, etc.
+
+## note: eviction filing rate calculated (# evictions / # renter occupied households)
+
+
+```
+
+
+```{r echo=FALSE}
+## creating key for geoid <--> boro
+geoid_boro_key = 
+  read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+         year %in% c(2010:2016)) %>% 
+  select(geoid, county = parent_location) %>% 
+  mutate(geoid = as.character(geoid),
+         boro = recode(county, "New York County, New York" = "Manhattan", 
+                               "Queens County, New York" = "Queens", 
+                               "Kings County, New York" = "Brooklyn", 
+                               "Bronx County, New York" = "Bronx", 
+                               "Richmond County, New York" = "Staten Island")) %>% 
+  distinct()
+```
+
+
+```{r echo=FALSE}
+joined_data = 
+  eviction %>% 
+  inner_join(., geoid_boro_key, by = "geoid") 
+
+## just brooklyn
+joined_data_bklyn =
+  joined_data %>% 
+  filter(boro == "Brooklyn")
+
+## all rows with all needed information, no missing
+joined_data_bklyn_nomissing =
+  joined_data_bklyn %>% 
+  drop_na()
+ 
+```
+
+
+
+```{r}
+
+# Create list of years 'years'
+
+years = joined_data_bklyn %>% distinct(year) %>% pull()
+
+# Create years drop-down widget
+
+selectInput(
+  "year_choice", 
+  label = h3("Select Year"),
+  choices = years, selected = "2000")
+```
+
+
+```{r}
+renderPrint({ 
+  input[["year_choice"]]
+})
+```
+
+
+
+```{r}
+
+
+# Loading census tract shapefiles from NYC OpenData:
+census_tracts = readOGR(dsn = "maps/2010-census-tracts.shp", encoding = "UTF-8") 
+
+census_tracts = 
+  census_tracts[census_tracts$boro_name == "Brooklyn", ]
+
+writeOGR(census_tracts,"./mapping_files","census_temp", driver = "ESRI Shapefile", overwrite_layer = TRUE)
+census_tracts = readOGR("./mapping_files","census_temp")
+
+# Constructing geoid for merging
+census_tracts@data = 
+  census_tracts@data %>% 
+  mutate(
+    county_code = as.character(recode(boro_code, "1" = "061", "2" = "005", "3" = "047", "4" = "081", "5" = "085")),
+    ct2010 = as.character(ct2010),
+    fips_11dig = paste0("36", county_code, ct2010),
+    long = coordinates(spTransform(census_tracts, CRS("+proj=longlat +datum=WGS84")))[,1],
+    lat = coordinates(spTransform(census_tracts, CRS("+proj=longlat +datum=WGS84")))[,2]
+    ) %>%
+  unnest(c(long, lat))
+
+
+```
+
+
+
+```{r}
+
+renderLeaflet({
+  
+  joined_data_bklyn_year = 
+  joined_data_bklyn  %>%
+  filter(year==input[["year_choice"]])
+
+# Joining data and shapefiles
+census_tracts@data = left_join(census_tracts@data, joined_data_bklyn_year, by = c("fips_11dig" = "geoid"))
+  
+# spatial transform
+census_tracts_crs = spTransform(census_tracts, CRS("+init=epsg:4326"))
+
+# get jenks natural breaks
+getJenksBreaks(census_tracts_crs$eviction_rate, 5)
+
+#set bins based on natural breaks
+eviction_rate_bins = c(0, 1.23, 2.51, 4.12, 7.62)
+
+#set color palette
+eviction_palette = colorBin('Blues', bins = eviction_rate_bins, na.color = '#d9d9d9')
+
+leaflet::leaflet(data = census_tracts_crs) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addPolygons(
+    fillColor = ~eviction_palette(eviction_rate),
+    fillOpacity = 0.8,
+    color = "BDBDC3",
+    weight = 1,
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) 
+
+  })
+```
+
+
+
