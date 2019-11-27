@@ -13,7 +13,7 @@ library(tidyverse)
 library(readxl)
 library(plotly)
 library(geepack)
-library(pstools)
+source('gee_stepper_o.R') ## custom stepwise function
 
 joined_data_bklyn_nomissing = 
   readRDS('./data/joined_data_bklyn_nomissing')
@@ -105,7 +105,7 @@ pred_poi_list = list("pct_eng" = pull(joined_data_bklyn_nomissing, pct_eng),
                      "pop_density" = pull(joined_data_bklyn_nomissing, total_pop_densitydata)
                      )
 
-gee_poi_output = map(pred_list, univariate_poi) %>%
+gee_poi_output = map(pred_poi_list, univariate_poi) %>%
   do.call(rbind, .) %>%
   knitr::kable(digits = 2,
                caption = "Univarable GEE parameter estimates: predicted change in rate of evictions (standardized by area-specific number of renter-occupied households)")
@@ -187,19 +187,135 @@ __Next Steps__
     + Cross-validation of models
   * Shiny app that builds model based on any variable we have (output = # evictions per 100 renter households per year)
 
+***
+
+## Correlation Plot
+
+```{r}
+joined_data_bklyn_nomissing %>% 
+  #select(-pct_nonwhite_racedata, -pct_af_am, am_ind_ak_native = aian) %>% 
+  select(pct_eng, rent_burden, density, 
+           white, black, asian, aian, nhpi, other, hisp) %>% 
+  select_if(is.numeric) %>% 
+  cor() %>% 
+  corrplot::corrplot(type = "lower",
+                     method = "square", 
+                     addCoef.col = "black", 
+                     diag = FALSE, 
+                     number.cex = .7,
+                     tl.col = "black",
+                     tl.cex = .9)
+
+## NOTES
+  ## include hisp instead of other, since highly correlated
+  ## include black not white, since highly correlated
+  ## fit two models:
+      ## one to look at pct_eng, controlling for race (pct_eng + all races except white, other + other predictors)
+      ## one to just look at race (all races except white, other + other predictors)
+```
+
+
+## Hypothesized Model
+
+```{r}
+hyp_model = 
+  geeglm(evictions ~
+           offset(log(renter_occupied_households)) +
+           years_since_2010 +
+           pct_eng + rent_burden + density + 
+           white + black + asian + aian + nhpi + other + hisp,
+         data = joined_data_bklyn_nomissing,
+         id = geoid,
+         family = poisson,
+         corstr = "ar1")
+
+hyp_model %>% 
+  broom::tidy() %>% 
+  knitr::kable()
+           
+
+## need to include `black` since confounds pct_eng -> evictions relationship
+  ## but `black` also collinear with `pct_nonwhite`, which we want as a predictor
+  ## solution: include all races EXCEPT WHITE AND OTHER in one analysis (interpret races)
+  ## then include races (minus white and hispanic) + pct_eng (ESL controlling for races)
+```
+
 ## Model Fitting using `gee_stepper`
-
-Variables to test:
-
-  * `years_since_2010`
-  * 
-
 
 ```{r}
 ## use full dataset
-joined_data_bklyn_nomissing %>% 
-  ## build a gee
-  ## put into gee_stepper
+full_fit =
+  geeglm(evictions ~ 
+           offset(log(renter_occupied_households)) + years_since_2010 +
+           pct_eng + rent_burden + pct_nonwhite_racedata + density + ## hypothesized
+           black + aian + asian + nhpi + other + hisp + ## race
+           poverty_rate + pct_renter_occupied + median_gross_rent + median_household_income + median_property_value,
+         data = joined_data_bklyn_nomissing,
+         id = geoid,
+         family = poisson,
+         corstr = "ar1")
+
+# gee_stepper_o(full_fit, formula(full_fit)) ## customized function to automatically include offset and time covariate
 
 ```
 
+Covariates selected by stepwise selection (using QIC):  
+  * [`offset`] - held constant
+  * [`years_since_2010`] - held constant
+  * `rent_burden` *
+  * `density` *
+  * `black` *
+  * `aian` new
+  * `asian` new
+  * `nhpi` *
+  * `hisp` new
+  * `pct_eng` new
+  * `poverty_rate` *
+  * `median_household_income` *
+  * `median_gross_rent` *
+
+Final formula:
+```{r}
+step_model = 
+  geeglm(formula = evictions ~ offset(log(renter_occupied_households)) + 
+           years_since_2010 + 
+           black + hisp + aian + asian + nhpi +
+           rent_burden + median_gross_rent + density + pct_eng + poverty_rate + median_household_income, 
+         family = poisson, 
+         data = joined_data_bklyn_nomissing, 
+         id = geoid, 
+         corstr = "ar1")
+
+
+```
+
+# Outline
+
+## Outcome
+
+### Distribution
+
+## Relevant predictors
+
+## Hypothesis
+
+### Raw plots of hypothesized predictors
+
+### Discussion of confounding of `black` on `pct_eng` -> `evictions`
+
+## Correlation matrix
+
+## Model building
+
+### Hypothesized models
+
+  * With `pct_eng`
+  * Without `pct_eng`
+  
+### Stepwise model
+
+## Residual vs. fit of each
+
+## Cross-validation of each
+
+## Conclusions
