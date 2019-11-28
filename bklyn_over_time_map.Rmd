@@ -1,5 +1,5 @@
 ---
-title: "Eviction Rates in Brooklyn Over Time: Map"
+title: "Eviction Rates in Brooklyn Over Time: Census Tract Map 2000-2016"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -103,13 +103,13 @@ sliderInput("years", "year of observation",
 
 
 # Loading census tract shapefiles from NYC OpenData:
-census_tracts = readOGR(dsn = "maps/2010-census-tracts.shp", encoding = "UTF-8") 
+census_tracts = readOGR(dsn = "maps/2010-census-tracts.shp", encoding = "UTF-8", verbose=FALSE) 
 
 census_tracts = 
   census_tracts[census_tracts$boro_name == "Brooklyn", ]
 
 writeOGR(census_tracts,"./mapping_files","census_temp", driver = "ESRI Shapefile", overwrite_layer = TRUE)
-census_tracts = readOGR("./mapping_files","census_temp")
+census_tracts = readOGR("./mapping_files","census_temp", verbose=FALSE)
 
 # Constructing geoid for merging
 census_tracts@data = 
@@ -161,7 +161,12 @@ leaflet::leaflet(data = census_tracts_crs) %>%
     fillOpacity = 0.8,
     color = "BDBDC3",
     weight = 1,
-    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) 
+    highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>% 
+      addLegend('bottomleft',
+                pal = eviction_palette,
+                values = ~eviction_rate,
+                title = 'Eviction Rates in NYC by census tract',
+                opacity = 1)
 
   })
 ```
