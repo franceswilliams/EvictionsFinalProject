@@ -1,5 +1,5 @@
 ---
-title: "Eviction Rates in Brooklyn Over Time"
+title: "Eviction Rates in Brooklyn Over Time by Neighborhood"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -89,7 +89,7 @@ choices = neighborhoods, selected = "Williamsburg")
 ```
 
 
-Figure 1 {data-width=650}
+Figure 1 {data-width=350}
 -----------------------------------------------------------------------
 ### Figure 1
 
@@ -115,6 +115,68 @@ brooklyn_data %>%
   
 
 ```
+
+
+```{r echo=FALSE}
+
+eviction = 
+  read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+         population != 0) %>% 
+  
+  ## selecting and renaming variables
+  mutate(pct_nonwhite = (100 - pct_white),
+         geoid = as.character(geoid),
+         year = as.ordered(year)) %>% 
+  select(geoid, year, ## contextual
+         evictions, eviction_filings, eviction_rate, eviction_filing_rate, renter_occupied_households, ## outcomes
+         pct_nonwhite_evictiondata = pct_nonwhite, ## hypothesized predictors
+         poverty_rate, rent_burden, pct_af_am, pct_renter_occupied, median_gross_rent, median_household_income, median_property_value) %>% ## other predictors
+  filter(renter_occupied_households > 10) # census tracts with few renter households were creating eviction rates of 150, 200, etc.
+
+## note: eviction filing rate calculated (# evictions / # renter occupied households)
+
+
+```
+
+
+```{r echo=FALSE}
+## creating key for geoid <--> boro
+geoid_boro_key = 
+  read.csv('./data/EvictionData_NY.csv') %>% 
+  janitor::clean_names() %>% 
+  filter(parent_location %in% c("New York County, New York", "Queens County, New York", "Kings County, New York", "Bronx County, New York", "Richmond County, New York"),
+         year %in% c(2010:2016)) %>% 
+  select(geoid, county = parent_location) %>% 
+  mutate(geoid = as.character(geoid),
+         boro = recode(county, "New York County, New York" = "Manhattan", 
+                               "Queens County, New York" = "Queens", 
+                               "Kings County, New York" = "Brooklyn", 
+                               "Bronx County, New York" = "Bronx", 
+                               "Richmond County, New York" = "Staten Island")) %>% 
+  distinct()
+```
+
+
+```{r echo=FALSE}
+joined_data = 
+  eviction %>% 
+  inner_join(., geoid_boro_key, by = "geoid") 
+
+## just brooklyn
+joined_data_bklyn =
+  joined_data %>% 
+  filter(boro == "Brooklyn")
+
+## all rows with all needed information, no missing
+joined_data_bklyn_nomissing =
+  joined_data_bklyn %>% 
+  drop_na()
+ 
+```
+
+
 
 
 

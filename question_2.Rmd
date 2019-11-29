@@ -1,28 +1,34 @@
 ---
-title: "Neighborhood Data"
-author: "Frances Williams"
-date: "11/8/2019"
+title: "Evictions & eviction filing discrepancies by neighborhood"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r echo = FALSE, message = FALSE}
 library(tidyverse)
 library(readxl)
 library(plotly)
-library(rgdal)
 library(maps)
 library(devtools)
 library(leaflet)
-library(maptools)
-library(BAMMtools)
 library(patchwork)
+library(BAMMtools)
 library(leafsync)
+```
+
+
+```{r echo = FALSE}
+# include = FALSE not working; using work around
+suppressPackageStartupMessages(library(rgdal))
 
 ```
+
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+library(maptools)
+```
+
 
 ```{r echo = FALSE, message = FALSE}
 neighborhood_df = 
@@ -33,10 +39,9 @@ neighborhood_df =
 #creating 11 digit FIPS code by pasting country code (36) with `county_code` and `census_tract`
   mutate(geo_id = paste0("36", county_code, census_tract)
   )
-
 ```
 
-Merging with evictions data/cleaning, weighting, and summarizing neighborhood-level data
+
 ```{r echo = FALSE, message = FALSE}
 eviction_data = read.csv('./data/EvictionData_NY.csv') %>% 
   janitor::clean_names() %>% 
@@ -69,13 +74,10 @@ neighborhood_data = neighborhood_data_prep %>%
 
 neighborhood_data <- within(neighborhood_data, wt_eviction_rate[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
 neighborhood_data <- within(neighborhood_data, wt_eviction_rate_discrep[neighborhood == 'park-cemetery-etc-Brooklyn'] <- NA)
-
 ```
 
-Loading neighborhood shapefile from NYC open data
-```{r echo = FALSE, message = FALSE}
-#neighborhood_map = readOGR(dsn = "mapping_files/NYC_BKneighborhoods.shp", encoding = "UTF-8")
 
+```{r include=FALSE, warning = FALSE, message = FALSE}
 neighborhood_map = readOGR(dsn = "maps/2010-NTAs.shp", encoding = "UTF-8")
 
 neighborhood_map = 
@@ -85,14 +87,13 @@ writeOGR(neighborhood_map,"./mapping_files","neighborhood_temp", driver = "ESRI 
 neighborhood_map = readOGR("./mapping_files","neighborhood_temp")
 
 neighborhood_map@data = left_join(neighborhood_map@data, neighborhood_data, by = c("ntaname" = "neighborhood"))
-```
 
-```{r echo = FALSE, message = FALSE}
+
 neighborhood_map_crs = spTransform(neighborhood_map, CRS("+init=epsg:4326"))
 ```
 
 
-```{r echo = FALSE, message = FALSE}
+```{r include=FALSE}
 #pop up label
 label_popup = paste0(
   "<strong>Neighborhood: </strong>",
@@ -109,10 +110,9 @@ eviction_rate_bins = c(0.2, 1.0, 1.8, 2.7, 3.6)
 
 #set color palette
 eviction_palette1 = colorBin('Reds', bins = eviction_rate_bins, na.color = '#d9d9d9')
-
 ```
 
-## Eviction rates by Brooklyn neighborhood, 2016
+
 ```{r echo = FALSE, message = FALSE}
 #create map
 map_evic = leaflet::leaflet(data = neighborhood_map_crs) %>% 
@@ -132,7 +132,7 @@ map_evic = leaflet::leaflet(data = neighborhood_map_crs) %>%
 ```
 
 
-```{r echo = FALSE, message = FALSE}
+```{r include=FALSE}
 #pop up label
 label_popup = paste0(
   "<strong>Neighborhood: </strong>",
@@ -149,12 +149,10 @@ eviction_rate_discrep_bins = c(0.95, 3.94, 7.23, 11.90, 29.37)
 
 #set color palette
 eviction_palette2 = colorBin('Reds', bins = eviction_rate_discrep_bins, na.color = '#d9d9d9')
-
-
 ```
 
-## Eviction filing rate/eviction rate discrepancy by Brooklyn neighborhood, 2016
-```{r}
+
+```{r echo = FALSE, message = FALSE}
 #create map
 map_discrep = leaflet::leaflet(data = neighborhood_map_crs) %>% 
   addProviderTiles('CartoDB.Positron') %>% 
@@ -171,34 +169,18 @@ map_discrep = leaflet::leaflet(data = neighborhood_map_crs) %>%
                 title = 'Eviction filing/eviction rate discrepancy',
                 opacity = 1)
 
+```
+
+
+<br>
+
+There were `r sum(pull(eviction_data, eviction_filings))` eviction filings and `r sum(pull(eviction_data, evictions))` evictions across Brooklyn in 2016. Eviction rates and eviction filing rates represent the number of evictions or eviction filings per neighborhood divided by the number of renter occupied households in a given neighborhood - that value is then multipled by 100 to represent a percentage. 
+
+```{r echo = FALSE}
 latticeview(map_evic, map_discrep)
 ```
 
-
-```{r echo = FALSE, message = FALSE}
-#STACKED BAR CHART
-#DELETE????
-bar_chart_evictions = neighborhood_data %>%
-  select(neighborhood, wt_eviction_rate, wt_eviction_rate_discrep) %>%
-  top_n(15, wt_eviction_rate) %>% 
-  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate)) %>%
-  pivot_longer(
-    cols = starts_with("wt"),
-    names_to = "rate_type",
-    names_prefix = "wt_",
-    values_to = "rates") %>% 
-  group_by(neighborhood) %>% 
-  arrange(desc(rates)) %>% 
-  ungroup() %>% 
-  ggplot(aes(x = neighborhood, y = rates, fill = rate_type)) +
-    geom_bar(position = "stack", stat = "identity") +
-    coord_flip()
-
-
-#HOW TO SWTICH RATE AND RATE DISCREP ON THE BAR
-
-
-```
+<br>
 
 
 ```{r echo = FALSE, message = FALSE}
@@ -213,11 +195,8 @@ barchart_evictions = neighborhood_data %>%
     scale_fill_manual(values = c("yes" = "red", "no" = "gray"), guide = FALSE) +
     coord_flip() + 
     labs(y = "Eviction Rate", x = "", title = "Brooklyn Neighborhood Characteristics, 2016")
-  
-```
 
 
-```{r echo = FALSE, message = FALSE}
 #bar chart of eviction filing/rate discrepancies
 bar_chart_eviction_discrep = neighborhood_data %>%
   top_n(15, wt_eviction_rate_discrep) %>% 
@@ -230,10 +209,7 @@ bar_chart_eviction_discrep = neighborhood_data %>%
     coord_flip() +
     labs(y = "Eviction Filing/Rate Discrepancy", x = "")
 
-```
 
-
-```{r echo = FALSE, message = FALSE}
 #bar chart of pct nonwhite
 bar_chart_pct_nonwhite = neighborhood_data %>%
   top_n(15, wt_pct_nonwhite) %>% 
@@ -246,10 +222,7 @@ bar_chart_pct_nonwhite = neighborhood_data %>%
     coord_flip() +
     labs(y = "Percent Nonwhite", x = "")
 
-```
 
-
-```{r echo = FALSE, message = FALSE}
 #bar chart of poverty rates
 bar_chart_poverty = neighborhood_data %>%
   top_n(15, wt_povertyrate) %>% 
@@ -261,10 +234,18 @@ bar_chart_poverty = neighborhood_data %>%
     scale_fill_manual(values = c("yes" = "red", "no" = "gray"), guide = FALSE) +
     coord_flip() +
     labs(y = "Poverty Rate", x = "")
+```
+
+<br>
+
+  To further compare eviction rates and filing discrepancies with neighborhood poverty rates and racial composition, we looked at the 10 neighborhoods with the highest rates of poverty, percent nonwhite population, eviction rate, and discrepancy between eviction rate and filing rate. Five neighborhoods appear in all four charts (in red).
+
+<br>
+
+```{r echo = FALSE, message = FALSE}
 
 (barchart_evictions + bar_chart_eviction_discrep) / (bar_chart_pct_nonwhite + bar_chart_poverty)
 
 ```
 
-The bar charts above take the 10 highest neighborhood values for the categories of eviction rates, eviction filing/rate discrepancy, percent non-white, and poverty rate. Five neighborhoods appear in all four charts. 
 
