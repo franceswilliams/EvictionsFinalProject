@@ -143,64 +143,78 @@ englang_2010 =
   read.csv("./data/ACS_10_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2010", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc170) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc21) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
-  select(-hc03_vc170)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc21))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc21)
 
 englang_2011 = 
   read.csv("./data/ACS_11_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2011", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc170) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc21) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
-  select(-hc03_vc170)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc21))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc21)
 
 englang_2012 = 
   read.csv("./data/ACS_12_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2012", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc170) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc21) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc170))) %>%
-  select(-hc03_vc170)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc21))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc21)
 
 englang_2013 = 
   read.csv("./data/ACS_13_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2013", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc21) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
-  select(-hc03_vc173)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc21))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc21)
 
 englang_2014 = 
   read.csv("./data/ACS_14_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2014", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc22) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
-  select(-hc03_vc173)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc22))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc22)
 
 englang_2015 = 
   read.csv("./data/ACS_15_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2015", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc22) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
-  select(-hc03_vc173)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc22))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc22)
 
 englang_2016 = 
   read.csv("./data/ACS_16_5YR_DP02_with_ann.csv") %>%
   janitor::clean_names() %>%
   mutate(year = "2016", geo_id = as.character(geo_id), geo_id2 = as.character(geo_id2)) %>%
-  select(year, geo_id, geo_id2, hc03_vc173) %>%
+  select(year, geo_id, geo_id2, hc03_vc170, hc03_vc04, hc01_vc22) %>% ## percent family households and avg family size
   filter(geo_id != "Id") %>%
-  mutate(pct_eng = as.numeric(as.character(hc03_vc173))) %>%
-  select(-hc03_vc173)
+  mutate(pct_eng = as.numeric(as.character(hc03_vc170)),
+         pct_fam_households = as.numeric(as.character(hc03_vc04)),
+         family_size = as.numeric(as.character(hc01_vc22))) %>%
+  select(-hc03_vc170, -hc03_vc04, -hc01_vc22)
 
 englang_data = 
   bind_rows(englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016) %>% 
@@ -208,7 +222,7 @@ englang_data =
          year = as.ordered(year)) %>% 
   
   ## restricting and renaming etc.
-  select(geoid = geo_id2, year, pct_eng) %>% 
+  select(geoid = geo_id2, year, pct_eng, family_size, pct_fam_households) %>% 
   
   ## bronx, kings, new york, queens, richmond counties - using codes (need to triple-check these match up with County Names)
   filter(substr(geoid, 1,5) %in% c(36005, 36047, 36061, 36081, 36085),
@@ -400,7 +414,7 @@ joined_data =
          pct_nonwhite_racedata, white, black, aian, asian, nhpi, other, hisp, ## race predictors
          rent_burden, pct_eng, density, ## other predictors
          renter_occupied_households, total_pop_densitydata, area_sqmi, ## calculation variables
-         poverty_rate, pct_af_am, pct_renter_occupied, median_gross_rent, median_household_income, median_property_value ## contextual predictor variables
+         poverty_rate, pct_af_am, pct_renter_occupied, median_gross_rent, median_household_income, median_property_value, family_size, pct_fam_households ## contextual predictor variables
          ) 
 
 ## just brooklyn
@@ -428,10 +442,5 @@ rm(area,
    englang_2010, englang_2011, englang_2012, englang_2013, englang_2014, englang_2015, englang_2016,
    race_2010, race_2011, race_2012, race_2013, race_2014, race_2015, race_2016,
    filenames_DP05)
-```
-
-```{r}
-## TO DO
-  ## Finish filling in Hispanic on DP05 tables!
 ```
 
