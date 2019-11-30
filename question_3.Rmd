@@ -617,27 +617,30 @@ model_data_cv =
 
  model_data_cv =
    model_data_cv %>%
-   mutate(rmse_empty_glm = map2_dbl(empty_glm1, test, ~rmse(model = .x, data = .y)),
-          rmse_naive_glm = map2_dbl(naive_glm1, test, ~rmse(model = .x, data = .y)),
+   mutate(#rmse_empty_glm = map2_dbl(empty_glm1, test, ~rmse(model = .x, data = .y)),
+          #rmse_naive_glm = map2_dbl(naive_glm1, test, ~rmse(model = .x, data = .y)),
           rmse_empty_gee = map2_dbl(empty, test, ~rmse(model = .x, data = .y)),
           rmse_naive_gee = map2_dbl(naive, test, ~rmse(model = .x, data = .y)),
-          rmse_eng_glm = map2_dbl(glm_eng1, test, ~rmse(model = .x, data = .y)),
+          #rmse_eng_glm = map2_dbl(glm_eng1, test, ~rmse(model = .x, data = .y)),
           #rmse_race_glm = map2_dbl(glm_race1, test, ~rmse(model = .x, data = .y)),
-          rmse_step_glm = map2_dbl(glm_step1, test, ~rmse(model = .x, data = .y)),
+          #rmse_step_glm = map2_dbl(glm_step1, test, ~rmse(model = .x, data = .y)),
           rmse_eng_gee = map2_dbl(gee_eng, test, ~rmse(model = .x, data = .y)),
-          #rmse_race_gee = map2_dbl(gee_race, test, ~rmse(model = .x, data = .y)),
+          rmse_race_gee = map2_dbl(gee_race, test, ~rmse(model = .x, data = .y)),
           rmse_step_gee = map2_dbl(gee_step, test, ~rmse(model = .x, data = .y)))
 
 ## plotting RMSEs
 model_data_cv %>%
-  select(starts_with("rmse")) %>%
+  select(starts_with("rmse"), -contains('glm')) %>%
   pivot_longer(
     everything(),
     names_to = "model",
     values_to = "rmse",
     names_prefix = "rmse_") %>%
-  mutate(model = fct_inorder(model)) %>%
-  ggplot(aes(x = model, y = rmse)) + geom_violin()
+  mutate(model = fct_reorder(model, rmse, .desc = TRUE)) %>%
+  ggplot(aes(x = model, y = rmse)) + 
+  geom_violin() +
+  theme_light()
+
 ```
 
 
