@@ -648,11 +648,81 @@ model_data_cv %>%
 
 ## Overview
 
-## Outcome
+Using existing data, we aim to investigate factors that are associated with - and can potentially be used to predict - eviction rates among census tracts in Brooklyn. 
 
-### Distribution
+We propose using Generalized Estimating Equations (GEE). GEEs can be used to model correlated/hierarchical data, and group-level (hierarchical) estimates are not desired. Since our data are repeated over time within census tract (2010-2016), we expect there to be autocorrelation present across years, and we can address this using GEE modeling techniques. 
+
+More specificaally, we propose using a GEE modelling framework with a log link function. Our outcome variable, eviction rate, is calculated by dividing count of evictions by the number of renter-occupied households; since this is based on a **count** variable, evictions, we expect our outcome to assume a Poisson distribution. Thus, we can use a log link function to model the expected count of evictions, and include the denominator of our eviction rate - number of renter-occupied households - as an offset term in the right-hand side of our equation.
+
+### Count-based outcome (Poisson)
+
+Since our outcome, eviction rate, is calculated using a **count** variable (number of evictions) repeated over time within areas, we'll model it using GEE with a Poisson link function.
+
+```{r, echo = FALSE, message = FALSE}
+#####
+## poisson distribution of counts (and rates)
+joined_data_bklyn_nomissing %>% 
+  ggplot(aes(x = eviction_rate)) + 
+  geom_histogram(binwidth = 0.1) +
+  theme_light() +
+  labs(x = "Eviction count per 100 renter-occupied households",
+       y = "Count",
+       title = "Distribution of eviction counts, standardized by area") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+&nbsp;
+&nbsp;
+
+**Model:**
+
+<!-- LaTeX code - edit on https://www.codecogs.com/latex/eqneditor.php, then download gif -->
+
+<!-- $$ -->
+<!-- (1) \hspace{20mm} log\{E({Y_{ij})}\} = log(n_{ij}) + \beta_0 + \beta_1*X_{ij} + \beta_2*year_{ij} \\ -->
+<!-- \hspace{20mm}\\ -->
+<!-- \hspace{20mm} \text{Where: }\\ -->
+<!-- \hspace{20mm} _{ij}\hspace{2mm} \text{denotes Census Tract \textit{i} and year \textit{j}} \\ -->
+<!-- \vspace{.01mm} \\ -->
+<!-- \hspace{20mm}E({Y_{ij})} = \text{expected count of evictions} \\ -->
+<!-- \hspace{20mm} n_{ij} = \text{offset term (number of renter-occupied housing units)} \\ -->
+<!-- \hspace{20mm}X_{ij} = \begin{cases}\text{Area percent of population that speaks English less than "Very Well"} -->
+<!-- \\ \text{Mean area rent burden (percentage of household income spent on rent)} -->
+<!-- \\ \text{Area percent of population that is nonwhite} -->
+<!-- \\ \text{Crude area population density (total population divided by area (mi} ^2) -->
+<!-- \end{cases}\\ -->
+<!-- $$ -->
+
+&nbsp; 
+&nbsp;
+
+![](./images/eq1.gif)
+
+&nbsp;
+&nbsp;
 
 ## Relevant predictors
+
+Although we formulated specific hypotheses regarding predictors of eviction in Brooklyn based on existing research, we wanted to include as many potential predictors as possible to test against our hypothesized predictors. The data we are using includes the following variables:
+
+  * `renter_occupied_households`. As mentioned above, this forms the denominator of our modelled rate and will be included in all models as an offset term (as `log(renter_occupied_households)`).
+  * `years_since_2010`. Since our data range from 2010 to 2016, and we did not want to assume a constant effect of time, we included year as a set of indicator variables in all models except our empty model (see below).
+
+<!-- ##### left off here ##### -->
+
+  * `hisp` 
+  * `rent_burden` *
+  * `density` *
+  * `pct_eng`
+  * `median_household_income` *
+  * `nhpi` *
+  * `poverty_rate` *
+  * `median_gross_rent` *
+  * `pct_renter_occupied`
+  * `aian` 
+  * `other`
+  * `pct_nonwhite_racedata`
+  * `asian` 
 
 ## Hypothesis
 
