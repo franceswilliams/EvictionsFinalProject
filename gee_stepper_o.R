@@ -29,7 +29,7 @@ gee_stepper_o.geeglm <- function(fit, upper) {
   preds_out <- preds
   preds_in  <- character(0)
   
-  fit0 <- stats::update(fit, formula = . ~ offset(log(renter_occupied_households)) + years_since_2010 + 1) ## CHANGED THIS
+  fit0 <- stats::update(fit, formula = . ~ offset(log(renter_occupied_households)) + 1) ## CHANGED THIS
   
   while(TRUE) {
     fits <-
