@@ -1,5 +1,5 @@
 ---
-title: "Evictions & eviction filing discrepancies by neighborhood"
+title: "Brooklyn Neighborhoods"
 output: html_document
 ---
 
@@ -177,7 +177,7 @@ map_discrep = leaflet::leaflet(data = neighborhood_map_crs) %>%
 There were `r sum(pull(eviction_data, eviction_filings))` eviction filings and `r sum(pull(eviction_data, evictions))` evictions across Brooklyn in 2016. Eviction rates and eviction filing rates represent the number of evictions or eviction filings per neighborhood divided by the number of renter occupied households in a given neighborhood - that value is then multipled by 100 to represent a percentage. 
 
 ```{r echo = FALSE}
-latticeview(map_evic, map_discrep)  
+sync(map_discrep, map_evic, sync = "all", sync.cursor = TRUE, no.initial.sync = TRUE)  
 
 #creating space  
 ```
@@ -249,38 +249,67 @@ To further compare eviction rates and filing discrepancies with neighborhood pov
 ```{r echo = FALSE, message = FALSE}
 
 
-(barchart_evictions + bar_chart_eviction_discrep) / (bar_chart_pct_nonwhite + bar_chart_poverty)
+#(barchart_evictions + bar_chart_eviction_discrep) / (bar_chart_pct_nonwhite + bar_chart_poverty)
 
 ```
 
-plotly test
-```{r}
-#bar chart of pct nonwhite
+
+
+```{r echo = FALSE, message = FALSE}
+
+#plotly bar chart of evcition rate
+barchart_evictions2 = neighborhood_data %>%
+  top_n(15, wt_eviction_rate) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate)) %>% 
+  plot_ly(x = ~wt_eviction_rate, y = ~neighborhood, type = 'bar', orientation = 'h', width = 1000, height = 700, marker = list(color = c('rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)'))) %>% 
+  layout(title = "",
+         xaxis = list(title = "Eviction Rate"),
+         yaxis = list(title = ""),
+         showlegend = FALSE)
+
+
+#bar chart of eviction filing/rate discrepancies
+bar_chart_eviction_discrep2 = neighborhood_data %>%
+  top_n(15, wt_eviction_rate_discrep) %>% 
+  mutate(neighborhood = fct_reorder(neighborhood, wt_eviction_rate_discrep)) %>% 
+  plot_ly(x = ~wt_eviction_rate_discrep, y = ~neighborhood, type = 'bar', orientation = 'h', width = 1000, height = 700, marker = list(color = c('rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)'))) %>% 
+  layout(title = "",
+         xaxis = list(title = "Filing Discrepancy"),
+         yaxis = list(title = ""),
+         showlegend = FALSE)
+
+
+#plotly bar chart of pct nonwhite
 bar_chart_pct_nonwhite2 = neighborhood_data %>%
   top_n(15, wt_pct_nonwhite) %>% 
   mutate(neighborhood = fct_reorder(neighborhood, wt_pct_nonwhite)) %>% 
-  plot_ly(x = ~wt_pct_nonwhite, y = ~neighborhood, type = 'bar', orientation = 'h', marker = list(color = c('rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)'))) %>% 
-  layout(title = "Percent Non-white",
-         xaxis = list(title = ""),
-         yaxis = list(title = ""))
+  plot_ly(x = ~wt_pct_nonwhite, y = ~neighborhood, type = 'bar', orientation = 'h', width = 1000, height = 700, marker = list(color = c('rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)'))) %>% 
+  layout(title = "",
+         xaxis = list(title = "Percent Nonwhite"),
+         yaxis = list(title = ""),
+         showlegend = FALSE)
 
-#bar_chart_pct_nonwhite2
 
-
-#bar chart of poverty rates
+#plotly bar chart of poverty rates
 bar_chart_poverty2 = neighborhood_data %>%
   top_n(15, wt_povertyrate) %>% 
   mutate(neighborhood = fct_reorder(neighborhood, wt_povertyrate)) %>% 
-  plot_ly(x = ~wt_povertyrate, y = ~neighborhood, type = 'bar', orientation = 'h', marker = list(color = c('rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)'))) %>% 
-  layout(title = "Poverty Rate",
-         xaxis = list(title = ""),
-         yaxis = list(title = ""))
+  plot_ly(x = ~wt_povertyrate, y = ~neighborhood, type = 'bar', orientation = 'h', width = 1000, height = 700, marker = list(color = c('rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(222,45,38,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)', 'rgba(204,204,204,1)'))) %>% 
+  layout(title = "",
+         xaxis = list(title = "Poverty Rate"),
+         yaxis = list(title = ""),
+         showlegend = FALSE)
+  
 
-#bar_chart_poverty2
 
-
-
-#subplot(bar_chart_pct_nonwhite2, bar_chart_poverty2)
+subplot(bar_chart_eviction_discrep2,
+        barchart_evictions2,
+        bar_chart_poverty2,
+        bar_chart_pct_nonwhite2,
+        nrows = 2, widths = c(0.5, 0.5),
+        margin = c(0.1, 0.2, 0.05, 0.05),
+        shareX = FALSE, shareY = FALSE,
+        titleX = TRUE, titleY = FALSE)
 
 ```
 
